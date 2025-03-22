@@ -1,0 +1,44 @@
+[
+  {
+    "id": "1",
+    "name": "Sample Chat",
+    "date": "2023-10-01T12:00:00Z",
+    "description": "Sample request",
+    "status": "editing",
+    "messages": [
+      {
+        "role": "assistant",
+        "content": "Hello, I need a custom fragrance."
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "name": "New Fragrance 2",
+    "status": "editing",
+    "date": "2025-03-22T23:51:53.745Z",
+    "description": "",
+    "messages": [
+      {
+        "role": "assistant",
+        "content": "What kind of fragrance would you like to create?"
+      },
+      {
+        "role": "user",
+        "content": "i want something new"
+      },
+      {
+        "role": "assistant",
+        "content": "Thank you for clarification! Could you provide more details?"
+      },
+      {
+        "role": "user",
+        "content": "hello"
+      },
+      {
+        "role": "assistant",
+        "content": "Thank you for clarification! Could you provide more details?"
+      }
+    ]
+  }
+]

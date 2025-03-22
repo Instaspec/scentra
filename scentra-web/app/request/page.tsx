@@ -1,9 +1,8 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
-import { Send, Clock, Check } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Send, Clock, Check, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -27,9 +26,10 @@ type Message = {
 type Request = {
   id: string
   name: string
-  status: "pending" | "sent" | "completed"
+  status: "editing" | "requested" | "confirmed"
   date: string
   description?: string
+  messages: Message[] // Update to use the unified Message type
 }
 
 export default function RequestPage() {
@@ -42,61 +42,103 @@ export default function RequestPage() {
   ])
   const [standardizedRequest, setStandardizedRequest] = useState<string | null>(null)
   const [currentObjectDescription, setCurrentObjectDescription] = useState<string | null>(null)
-  const [selectedRequestId, setSelectedRequestId] = useState<string>("1")
-  const [requests, setRequests] = useState<Request[]>([
-    {
-      id: "1",
-      name: "Summer Breeze",
-      status: "sent",
-      date: "2025-03-15",
-      description:
-        "Fresh citrus-based fragrance with medium intensity, long-lasting profile. Primary notes: bergamot, lemon, light floral undertones. Avoid: heavy musk, overly sweet components.",
-    },
-    {
-      id: "2",
-      name: "Ocean Mist",
-      status: "completed",
-      date: "2025-03-10",
-      description:
-        "Marine-inspired scent with aquatic notes, medium-light intensity. Primary notes: sea salt, cucumber, light musk. Avoid: heavy florals, spicy components.",
-    },
-    {
-      id: "3",
-      name: "Citrus Burst",
-      status: "pending",
-      date: "2025-03-20",
-    },
-  ])
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null)
+  const [requests, setRequests] = useState<Request[]>([])
 
-  const handleSendMessage = () => {
+  // Fetch requests from the local JSON file
+  useEffect(() => {
+    const fetchRequests = async () => {
+      const res = await fetch("/api/chats")
+      const data = await res.json()
+      setRequests(data)
+
+      // Initialize messages from the first request if available
+      if (data.length > 0 && data[0].messages) {
+        setMessages(data[0].messages)
+      }
+    }
+    fetchRequests()
+  }, [])
+
+  const handleSendMessage = async () => {
     if (!input.trim()) return
 
-    // Add user message
-    const newMessages: Message[] = [...messages, { role: "user", content: input }]
-    setMessages(newMessages)
-    setInput("")
+    let updatedChat: Request
 
-    // Simulate chatbot response and update object description
-    setTimeout(() => {
-      let botResponse = ""
-
-      if (newMessages.length === 2) {
-        botResponse = "Could you tell me more about the intensity and longevity you're looking for?"
-        setCurrentObjectDescription("Fresh, citrusy scent reminiscent of summer mornings. Not overpowering.")
-      } else if (newMessages.length === 4) {
-        botResponse = "What specific notes or ingredients would you like to include or avoid?"
-        setCurrentObjectDescription("Fresh, citrusy scent. Medium intensity, 6-8 hour longevity. Not overpowering.")
-      } else if (newMessages.length === 6) {
-        botResponse = "Thank you for the details. I've standardized your request."
-        const finalDescription =
-          "Fresh citrus-based fragrance with medium intensity, long-lasting profile. Primary notes: bergamot, lemon, light floral undertones. Avoid: heavy musk, overly sweet components."
-        setCurrentObjectDescription(finalDescription)
-        setStandardizedRequest(finalDescription)
-      } else {
-        botResponse = "Is there anything else you'd like to add to your request?"
+    if (!selectedRequestId) {
+      // Create a new chat
+      updatedChat = {
+        id: (requests.length + 1).toString(),
+        name: `New Fragrance ${requests.length + 1}`,
+        status: "editing",
+        date: new Date().toISOString(),
+        description: "",
+        messages: [
+          { role: "assistant", content: "What kind of fragrance would you like to create?" },
+          { role: "user", content: input },
+        ],
       }
 
-      setMessages((prev) => [...prev, { role: "assistant", content: botResponse }])
+      // Add the new chat to the state
+      setRequests([...requests, updatedChat])
+      setSelectedRequestId(updatedChat.id)
+      setMessages(updatedChat.messages)
+    } else {
+      // Update an existing chat
+      const existingChat = requests.find((req) => req.id === selectedRequestId)
+
+      if (!existingChat) {
+        console.error(`Chat with ID ${selectedRequestId} not found.`)
+        return
+      }
+
+      // Add the new user input to the chat's messages
+      const updatedMessages = [...existingChat.messages, { role: "user", content: input }]
+      updatedChat = {
+        ...existingChat,
+        messages: updatedMessages,
+      }
+
+      // Update the chat in the state
+      setRequests(requests.map((req) => (req.id === selectedRequestId ? updatedChat : req)))
+      setMessages(updatedMessages)
+    }
+
+    setInput("") // Clear input after sending the message
+
+    // Save the updated chat to the backend and refresh the requests state
+    const response = await fetch("/api/chats", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedChat),
+    })
+
+    if (response.ok) {
+      const updatedRequests = await response.json()
+      setRequests(updatedRequests) // Update the requests state with the latest data
+    }
+
+    // Simulate chatbot response
+    setTimeout(async () => {
+      const botResponse = "Thank you for clarification! Could you provide more details?"
+      const updatedMessages = [...updatedChat.messages, { role: "assistant", content: botResponse }]
+      const finalUpdatedChat = { ...updatedChat, messages: updatedMessages }
+
+      // Update the chat with the assistant's response in the state
+      setMessages(updatedMessages)
+      setRequests(requests.map((req) => (req.id === updatedChat.id ? finalUpdatedChat : req)))
+
+      // Save the updated chat with the assistant's response to the backend and refresh the requests state
+      const response = await fetch("/api/chats", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(finalUpdatedChat),
+      })
+
+      if (response.ok) {
+        const updatedRequests = await response.json()
+        setRequests(updatedRequests) // Update the requests state with the latest data
+      }
     }, 1000)
   }
 
@@ -113,9 +155,10 @@ export default function RequestPage() {
       const newRequest = {
         id: (requests.length + 1).toString(),
         name: `New Fragrance ${requests.length + 1}`,
-        status: "sent" as const,
-        date: new Date().toISOString().split("T")[0],
+        status: "requested" as const,
+        date: new Date().toISOString(),
         description: standardizedRequest,
+        messages,
       }
 
       setRequests([...requests, newRequest])
@@ -126,10 +169,12 @@ export default function RequestPage() {
   const selectRequest = (requestId: string) => {
     setSelectedRequestId(requestId)
     const selectedRequest = requests.find((req) => req.id === requestId)
-    if (selectedRequest?.description) {
-      setStandardizedRequest(selectedRequest.description)
-      setCurrentObjectDescription(selectedRequest.description)
+    if (selectedRequest) {
+      setMessages(selectedRequest.messages)
+      setStandardizedRequest(selectedRequest.description || null)
+      setCurrentObjectDescription(selectedRequest.description || null)
     } else {
+      setMessages([])
       setStandardizedRequest(null)
       setCurrentObjectDescription(null)
     }
@@ -141,8 +186,15 @@ export default function RequestPage() {
       <SidebarProvider>
         {/* Sidebar */}
         <Sidebar className="border-r">
-          <SidebarHeader className="p-4">
-            <h2 className="text-xl font-semibold">My Requests</h2>
+          <SidebarHeader className="p-4 flex items-center flex-row">
+            <h2 className="text-xl font-semibold flex-1">My Requests</h2>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSelectedRequestId(null)} // Reset selectedRequestId
+            >
+              <Plus className="h-5 w-5" />
+            </Button>
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
@@ -153,12 +205,12 @@ export default function RequestPage() {
                     onClick={() => selectRequest(request.id)}
                   >
                     <div className="flex items-center gap-2">
-                      {request.status === "pending" && <Clock className="h-4 w-4 text-yellow-500" />}
-                      {request.status === "sent" && <Send className="h-4 w-4 text-blue-500" />}
-                      {request.status === "completed" && <Check className="h-4 w-4 text-green-500" />}
+                      {request.status === "editing" && <Clock className="h-4 w-4 text-yellow-500" />}
+                      {request.status === "requested" && <Send className="h-4 w-4 text-blue-500" />}
+                      {request.status === "confirmed" && <Check className="h-4 w-4 text-green-500" />}
                       <span>{request.name}</span>
                     </div>
-                    <span className="text-xs text-muted-foreground">{request.date}</span>
+                    <span className="text-xs text-muted-foreground">{new Date(request.date).toLocaleDateString()}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -174,8 +226,25 @@ export default function RequestPage() {
 
         {/* Main Content */}
         <div className="flex flex-1 flex-col">
+          {/* Initial Screen */}
+          {!selectedRequestId && (
+            <div className="flex flex-1 items-center justify-center flex-col gap-4">
+              <h2 className="text-xl font-semibold text-center">
+                What kind of fragrance would you like to create?
+              </h2>
+              <div className="text-sm text-muted-foreground text-center space-y-2">
+                <p><strong>Product & Market</strong> – What’s the product type and target audience?</p>
+                <p><strong>Fragrance Profile</strong> – Preferred olfactive family, key notes, and reference scents?</p>
+                <p><strong>Story & Emotion</strong> – What mood or experience should it evoke?</p>
+                <p><strong>Technical Specs</strong> – Desired concentration, ingredient restrictions?</p>
+                <p><strong>Market & Positioning</strong> – Competitor references, unique selling points?</p>
+                <p><strong>Budget & Timeline</strong> – What are the financial and deadline constraints?</p>
+              </div>
+            </div>
+          )}
+
           {/* Standardized Request Display */}
-          {standardizedRequest && (
+          {selectedRequestId && standardizedRequest && (
             <div className="border-b bg-muted/50 p-4">
               <h3 className="mb-2 font-medium">Standardized Fragrance Request:</h3>
               <p className="text-sm">{standardizedRequest}</p>
@@ -183,7 +252,7 @@ export default function RequestPage() {
           )}
 
           {/* Current Object Description */}
-          {currentObjectDescription && !standardizedRequest && (
+          {selectedRequestId && currentObjectDescription && !standardizedRequest && (
             <div className="border-b p-4">
               <h3 className="mb-2 font-medium">Current Description:</h3>
               <Card>
@@ -201,20 +270,22 @@ export default function RequestPage() {
           )}
 
           {/* Chat Area */}
-          <ScrollArea className="flex-1 p-4">
-            <div className="space-y-4">
-              {messages.map((message, index) => (
-                <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div
-                    className={`max-w-[80%] rounded-lg p-3 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
-                      }`}
-                  >
-                    {message.content}
+          {selectedRequestId && (
+            <ScrollArea className="flex-1 p-4">
+              <div className="space-y-4">
+                {messages.map((message, index) => (
+                  <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                    <div
+                      className={`max-w-[80%] rounded-lg p-3 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
+                        }`}
+                    >
+                      {message.content}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </ScrollArea>
+                ))}
+              </div>
+            </ScrollArea>
+          )}
 
           {/* Input Area */}
           <div className="border-t p-4">
@@ -232,8 +303,8 @@ export default function RequestPage() {
             </div>
           </div>
         </div>
-      </SidebarProvider>
-    </div>
+      </SidebarProvider >
+    </div >
   )
 }
 
