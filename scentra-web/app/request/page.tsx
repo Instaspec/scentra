@@ -72,7 +72,7 @@ export default function RequestPage() {
     if (!input.trim()) return
 
     // Add user message
-    const newMessages = [...messages, { role: "user", content: input }]
+    const newMessages: Message[] = [...messages, { role: "user", content: input }]
     setMessages(newMessages)
     setInput("")
 
@@ -206,9 +206,8 @@ export default function RequestPage() {
               {messages.map((message, index) => (
                 <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                   <div
-                    className={`max-w-[80%] rounded-lg p-3 ${
-                      message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
-                    }`}
+                    className={`max-w-[80%] rounded-lg p-3 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
+                      }`}
                   >
                     {message.content}
                   </div>
