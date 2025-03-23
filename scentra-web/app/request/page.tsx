@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
-import { Send, Clock, Check, Plus } from "lucide-react"
+import { Send, Clock, Check, Plus, Loader } from "lucide-react" // Import Loader icon
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -44,6 +44,7 @@ export default function RequestPage() {
   const [standardizedRequest, setStandardizedRequest] = useState<string | null>(null)
   const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null)
   const [requests, setRequests] = useState<Request[]>([])
+  const [loading, setLoading] = useState(false) // Add loading state
 
   // Fetch requests from the local JSON file
   useEffect(() => {
@@ -63,6 +64,7 @@ export default function RequestPage() {
   const handleSendMessage = async () => {
     if (!input.trim()) return
 
+    setLoading(true) // Set loading to true
     let updatedChat: Request
 
     if (!selectedRequestId) {
@@ -101,6 +103,7 @@ export default function RequestPage() {
 
       if (!existingChat) {
         console.error(`Chat with ID ${selectedRequestId} not found.`)
+        setLoading(false) // Reset loading
         return
       }
 
@@ -165,6 +168,8 @@ export default function RequestPage() {
     } else {
       console.error("Failed to fetch OpenAI response")
     }
+
+    setLoading(false) // Reset loading
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -205,6 +210,14 @@ export default function RequestPage() {
 
   return (
     <div className="flex h-screen">
+      {/* Show loading screen */}
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+          <Loader className="h-10 w-10 animate-spin text-primary" />
+          <span className="ml-4 text-lg font-medium">Processing your request...</span>
+        </div>
+      )}
+
       {/* Wrap with SidebarProvider */}
       <SidebarProvider>
         {/* Sidebar */}
