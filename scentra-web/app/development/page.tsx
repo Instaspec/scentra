@@ -180,8 +180,15 @@ export default function DevelopmentPage() {
         <div className="flex-1 overflow-auto p-6 w-full max-w-none">
           <div className="mx-auto w-full max-w-none">
             {currentStep === 0 && <ClientRequestReview />}
-            {currentStep === 1 && <ReferenceProductSelection />}
-            {currentStep === 2 && <RecipeFormulation />}
+            {currentStep === 1 && (
+              <ReferenceProductSelection
+                oils={oils}
+                isLoadingOils={isLoadingOils}
+              />
+            )}
+            {currentStep === 2 && (
+              <RecipeFormulation oils={oils} isLoadingOils={isLoadingOils} />
+            )}
           </div>
         </div>
 

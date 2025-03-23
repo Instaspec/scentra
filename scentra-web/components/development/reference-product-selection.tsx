@@ -28,7 +28,7 @@ type ReferenceProduct = {
 };
 
 type ReferenceProductSelectionProps = {
-  oils: Oil[];
+  oils: Record<string, Oil>;
   isLoadingOils: boolean;
 };
 
@@ -44,12 +44,7 @@ export function ReferenceProductSelection({
       name: "Citrus Splash",
       description: "Bright and refreshing citrus blend with bergamot and lemon",
       compounds: ["Limonene", "Linalool", "Citral", "Geraniol"],
-      ingredients: [
-        "Bergamot oil",
-        "Lemon oil",
-        "Orange peel extract",
-        "Neroli oil",
-      ],
+      ingredients: ["CRESOL10", "CRESOL90", "CRESOL122", "CRESOL24"],
       selected: false,
     },
     {
@@ -57,12 +52,7 @@ export function ReferenceProductSelection({
       name: "Summer Breeze",
       description: "Light floral with citrus undertones, medium intensity",
       compounds: ["Linalool", "Citronellol", "Geraniol", "Limonene"],
-      ingredients: [
-        "Bergamot oil",
-        "Rose extract",
-        "Jasmine absolute",
-        "Lemon oil",
-      ],
+      ingredients: ["CRESOL212", "CRESOL56", "CRESOL20", "CRESOL19"],
       selected: false,
     },
     {
@@ -70,12 +60,7 @@ export function ReferenceProductSelection({
       name: "Morning Zest",
       description: "Energizing citrus with green notes, long-lasting",
       compounds: ["Limonene", "Pinene", "Linalyl acetate", "Terpineol"],
-      ingredients: [
-        "Lemon oil",
-        "Petitgrain oil",
-        "Grapefruit oil",
-        "Green tea extract",
-      ],
+      ingredients: ["CRESOL17", "CRESOL70", "CRESOL142", "CRESOL210"],
       selected: false,
     },
     {
@@ -83,12 +68,7 @@ export function ReferenceProductSelection({
       name: "Citrus Garden",
       description: "Balanced citrus and herbal blend with medium projection",
       compounds: ["Limonene", "Linalool", "Terpinene", "Caryophyllene"],
-      ingredients: [
-        "Bergamot oil",
-        "Lemon verbena",
-        "Mandarin oil",
-        "Basil extract",
-      ],
+      ingredients: ["CRESOL80", "CRESOL10", "CRESOL122", "CRESOL11"],
       selected: false,
     },
   ]);
@@ -218,14 +198,17 @@ export function ReferenceProductSelection({
                         Raw Ingredients
                       </h4>
                       <ul className="space-y-1 text-xs">
-                        {product.ingredients.map((ingredient) => (
-                          <li
-                            key={ingredient}
-                            className="text-muted-foreground"
-                          >
-                            {ingredient}
-                          </li>
-                        ))}
+                        {product.ingredients
+                          .filter((ingredient) => oils[ingredient])
+                          .map((ingredient) => (
+                            <li
+                              key={ingredient}
+                              className="text-muted-foreground"
+                            >
+                              {oils[ingredient]?.essential_oil_name ||
+                                ingredient}
+                            </li>
+                          ))}
                       </ul>
                     </div>
                   </div>

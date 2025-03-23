@@ -52,7 +52,7 @@ type Recipe = {
 };
 
 type RecipeFormulationProps = {
-  oils: Oil[];
+  oils: Record<string, Oil>;
   isLoadingOils: boolean;
 };
 

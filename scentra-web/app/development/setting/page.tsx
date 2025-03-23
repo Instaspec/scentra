@@ -58,12 +58,7 @@ export default function SettingsPage() {
       name: "Citrus Splash",
       description: "Bright and refreshing citrus blend with bergamot and lemon",
       compounds: ["Limonene", "Linalool", "Citral", "Geraniol"],
-      ingredients: [
-        "Bergamot oil",
-        "Lemon oil",
-        "Orange peel extract",
-        "Neroli oil",
-      ],
+      ingredients: ["CRESOL10", "CRESOL90", "CRESOL122", "CRESOL24"],
       file: "citrus_splash.xlsx",
     },
     {
@@ -71,12 +66,8 @@ export default function SettingsPage() {
       name: "Summer Breeze",
       description: "Light floral with citrus undertones, medium intensity",
       compounds: ["Linalool", "Citronellol", "Geraniol", "Limonene"],
-      ingredients: [
-        "Bergamot oil",
-        "Rose extract",
-        "Jasmine absolute",
-        "Lemon oil",
-      ],
+      ingredients: ["CRESOL212", "CRESOL56", "CRESOL20", "CRESOL19"],
+
       file: "summer_breeze.xlsx",
     },
   ]);
@@ -145,7 +136,7 @@ export default function SettingsPage() {
         name: file.name.split(".")[0].replace(/_/g, " "),
         description: "New uploaded reference product",
         compounds: ["Sample Compound 1", "Sample Compound 2"],
-        ingredients: ["Sample Ingredient 1", "Sample Ingredient 2"],
+        ingredients: ["CRESOL1", "CRESOL2"],
         file: file.name,
       };
 
@@ -345,14 +336,17 @@ export default function SettingsPage() {
                               Raw Ingredients
                             </h5>
                             <ul className="space-y-1 text-xs">
-                              {product.ingredients.map((ingredient, index) => (
-                                <li
-                                  key={index}
-                                  className="text-muted-foreground"
-                                >
-                                  {ingredient}
-                                </li>
-                              ))}
+                              {product.ingredients
+                                .filter((ingredient) => oils[ingredient])
+                                .map((ingredient, index) => (
+                                  <li
+                                    key={index}
+                                    className="text-muted-foreground"
+                                  >
+                                    {oils[ingredient]?.essential_oil_name ||
+                                      ingredient}
+                                  </li>
+                                ))}
                             </ul>
                           </div>
                         </div>
