@@ -81,8 +81,8 @@ export default function RequestPage() {
         ],
       }
 
-      // Add the new chat to the state
-      setRequests([...requests, updatedChat])
+      // Add the new chat to the state immediately
+      setRequests((prevRequests) => [...prevRequests, updatedChat])
       setSelectedRequestId(updatedChat.id)
       setMessages(updatedChat.messages)
 
@@ -95,7 +95,7 @@ export default function RequestPage() {
 
       if (response.ok) {
         const updatedRequests = await response.json()
-        setRequests(updatedRequests)
+        setRequests(updatedRequests) // Update the state with the backend data
       }
     } else {
       // Update an existing chat
@@ -114,8 +114,10 @@ export default function RequestPage() {
         messages: updatedMessages,
       }
 
-      // Update the chat in the state
-      setRequests(requests.map((req) => (req.id === selectedRequestId ? updatedChat : req)))
+      // Update the chat in the state immediately
+      setRequests((prevRequests) =>
+        prevRequests.map((req) => (req.id === selectedRequestId ? updatedChat : req))
+      )
       setMessages(updatedMessages)
 
       // Save the updated chat to the backend
@@ -127,7 +129,7 @@ export default function RequestPage() {
 
       if (response.ok) {
         const updatedRequests = await response.json()
-        setRequests(updatedRequests)
+        setRequests(updatedRequests) // Update the state with the backend data
       }
     }
 
@@ -148,16 +150,15 @@ export default function RequestPage() {
 
       setStandardizedRequest(description)
 
-      console.log("DESCRIPTION", description)
-      console.log("INSTRUCTION", instruction)
-
       // Finalize the assistant's response
       const updatedMessages = [...updatedChat.messages, { role: "assistant", content: instruction }]
       const finalUpdatedChat = { ...updatedChat, messages: updatedMessages }
 
       // Update the chat with the assistant's response in the state
+      setRequests((prevRequests) =>
+        prevRequests.map((req) => (req.id === updatedChat.id ? finalUpdatedChat : req))
+      )
       setMessages(updatedMessages)
-      setRequests(requests.map((req) => (req.id === updatedChat.id ? finalUpdatedChat : req)))
 
       // Save the updated chat with the assistant's response to the backend
       await fetch("/api/chats", {
