@@ -30,11 +30,13 @@ type ReferenceProduct = {
 type ReferenceProductSelectionProps = {
   oils: Record<string, Oil>;
   isLoadingOils: boolean;
+  selectedRequest: string;
 };
 
 export function ReferenceProductSelection({
   oils,
   isLoadingOils,
+  selectedRequest,
 }: ReferenceProductSelectionProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [notes, setNotes] = useState("");

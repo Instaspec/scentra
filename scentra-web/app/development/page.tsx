@@ -184,10 +184,15 @@ export default function DevelopmentPage() {
               <ReferenceProductSelection
                 oils={oils}
                 isLoadingOils={isLoadingOils}
+                selectedRequest={selectedRequest}
               />
             )}
             {currentStep === 2 && (
-              <RecipeFormulation oils={oils} isLoadingOils={isLoadingOils} />
+              <RecipeFormulation
+                oils={oils}
+                isLoadingOils={isLoadingOils}
+                selectedRequest={selectedRequest}
+              />
             )}
           </div>
         </div>

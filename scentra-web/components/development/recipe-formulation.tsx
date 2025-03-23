@@ -2,8 +2,17 @@
 
 import type React from "react";
 
-import { useState } from "react";
-import { Beaker, Save, Plus, Trash2, Copy, GripVertical } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import {
+  Beaker,
+  Save,
+  Plus,
+  Trash2,
+  Copy,
+  GripVertical,
+  Sparkles,
+  Loader2,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -54,11 +63,25 @@ type Recipe = {
 type RecipeFormulationProps = {
   oils: Record<string, Oil>;
   isLoadingOils: boolean;
+  selectedRequest: string;
+};
+
+type ChatLog = {
+  date: string;
+  description: string;
+  id: string;
+  messages: {
+    role: string;
+    content: string;
+  }[];
+  name: string;
+  status: string;
 };
 
 export function RecipeFormulation({
   oils,
   isLoadingOils,
+  selectedRequest,
 }: RecipeFormulationProps) {
   const [activeRecipeId, setActiveRecipeId] = useState("recipe-1");
   const [notes, setNotes] = useState("");
@@ -71,6 +94,10 @@ export function RecipeFormulation({
     null
   );
   const [isNewVersionDialogOpen, setIsNewVersionDialogOpen] = useState(false);
+  const [isAiGenerating, setIsAiGenerating] = useState(false);
+  const [chatLog, setChatLog] = useState<ChatLog[]>([]);
+  const [selectedChat, setSelectedChat] = useState<ChatLog | null>(null);
+  const [currentDescription, setCurrentDescription] = useState<string>("");
 
   const [recipes, setRecipes] = useState<Recipe[]>([
     {
@@ -189,8 +216,101 @@ export function RecipeFormulation({
     setIsNewVersionDialogOpen(false);
   };
 
-  const createNewVersionFromScratch = () => {
+  const createNewVersionFromScratch = useCallback(() => {
     if (!activeRecipe) return;
+
+    setIsAiGenerating(true);
+    // Call API for recommendation based on current description
+    fetch("/api/recommend", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ customerDescription: currentDescription }),
+    })
+      /*
+    {
+    "recommended_oils": [
+        {
+            "name": "Catharanthus roseus nirmal essential oil",
+            "oil_id": "CRESOL147",
+            "match_score": "9",
+            "reasoning": "Bright citrus character that matches the fresh profile requested",
+            "blending_suggestions": [
+                "Pairs well with lavender and ylang-ylang"
+            ]
+        },
+        {
+            "name": "Centratherum punctatum  essential oil",
+            "oil_id": "CRESOL237",
+            "match_score": "8",
+            "reasoning": "Provides floral notes with calming properties",
+            "blending_suggestions": [
+                "Use as a middle note with bergamot as the top note"
+            ]
+        },
+        {
+            "name": "Mentha arvensis MAS-1 essential oil",
+            "oil_id": "CRESOL10",
+            "match_score": "7",
+            "reasoning": "Adds warm base notes for longevity",
+            "blending_suggestions": [
+                "Use sparingly as a fixative"
+            ]
+        },
+        {
+            "name": "Rosa damascena Noorjahan essential oil",
+            "oil_id": "CRESOL129",
+            "match_score": "6",
+            "reasoning": "Adds warm base notes for longevity",
+            "blending_suggestions": [
+                "Use sparingly as a fixative"
+            ]
+        }
+    ],
+    "blending_notes": "This combination creates a balanced profile with citrus top notes, floral middle notes, and woody base notes",
+    "alternative_suggestions": [
+        "Lemon oil can substitute for bergamot",
+        "Cedarwood can replace sandalwood"
+    ]
+}
+    */
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Recommendation response:", data);
+        // update the active recipe with the recommended oils
+        // extract oil names, and blending notes
+        const recommendedOils = data.recommended_oils;
+        const recommendedOilsNames = recommendedOils.map(
+          (oil: any) => oil.name
+        );
+        const blendingNotes = data.blending_notes;
+        const alternativeSuggestions = data.alternative_suggestions;
+
+        // update the active recipe with the recommended oils
+        setRecipes(
+          recipes.map((recipe) =>
+            recipe.id === activeRecipe.id
+              ? {
+                  ...recipe,
+                  ingredients: recommendedOilsNames.map((oil: string) => ({
+                    id: oil,
+                    name: oil,
+                    dosage: 10,
+                    unit: "%",
+                  })),
+                }
+              : recipe
+          )
+        );
+
+        setNotes(blendingNotes + "\n" + alternativeSuggestions.join("\n"));
+        setIsAiGenerating(false);
+      })
+      .catch((error) => {
+        console.error("Error getting recommendation:", error);
+        setIsAiGenerating(false);
+      });
 
     const newRecipe: Recipe = {
       id: `recipe-${recipes.length + 1}`,
@@ -206,7 +326,7 @@ export function RecipeFormulation({
     setRecipes([...recipes, newRecipe]);
     setActiveRecipeId(newRecipe.id);
     setIsNewVersionDialogOpen(false);
-  };
+  }, [activeRecipe, currentDescription, recipes]);
 
   const calculateTotal = (ingredients: Ingredient[]) => {
     return ingredients
@@ -254,6 +374,51 @@ export function RecipeFormulation({
     setDraggedIngredient(null);
   };
 
+  useEffect(() => {
+    const loadChatLog = async () => {
+      try {
+        const response = await fetch("/api/chats");
+        if (!response.ok) {
+          throw new Error(`Failed to fetch chat log: ${response.status}`);
+        }
+        const data = await response.json();
+        setChatLog(data);
+        console.log(data);
+      } catch (error) {
+        console.error("Error loading chat log:", error);
+      }
+    };
+
+    loadChatLog();
+  }, []);
+
+  useEffect(() => {
+    if (chatLog.length > 0) {
+      for (const chat of chatLog) {
+        if (chat.id === selectedRequest) {
+          console.log(`chat: ${JSON.stringify(chat)}`);
+          setSelectedChat(chat);
+        }
+      }
+    }
+  }, [chatLog, selectedRequest]);
+
+  useEffect(() => {
+    if (selectedChat) {
+      // Check if the chat has a "requested" status and a non-empty description
+      if (
+        selectedChat.status === "requested" &&
+        selectedChat.description.trim() !== ""
+      ) {
+        // If the chat has a requested status and description, set the current description
+        setCurrentDescription(selectedChat.description);
+      } else {
+        // Otherwise, set an empty description
+        setCurrentDescription("");
+      }
+    }
+  }, [selectedChat]);
+
   return (
     <div className="space-y-6 w-full">
       {/* Recipe Selector and Controls */}
@@ -294,8 +459,8 @@ export function RecipeFormulation({
                     className="h-24 flex flex-col items-center justify-center gap-2 p-4"
                     onClick={createNewVersionFromScratch}
                   >
-                    <Plus className="h-8 w-8" />
-                    <span>Start From Scratch</span>
+                    <Sparkles className="h-8 w-8" />
+                    <span>Start From AI Recipe</span>
                   </Button>
                 </div>
                 <DialogFooter>
@@ -346,133 +511,156 @@ export function RecipeFormulation({
                 </div>
                 <ScrollArea className="h-[300px]">
                   <div className="p-3">
-                    <div className="mb-2 grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground">
-                      <div className="col-span-1"></div>
-                      <div className="col-span-5">Ingredient</div>
-                      <div className="col-span-4">Dosage</div>
-                      <div className="col-span-2">Actions</div>
-                    </div>
-
-                    {activeRecipe.ingredients.length === 0 ? (
-                      <div className="py-8 text-center text-muted-foreground">
-                        No ingredients added yet. Add your first ingredient
-                        below.
+                    {isAiGenerating ? (
+                      <div className="flex flex-col items-center justify-center h-[200px] gap-4">
+                        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                        <p className="text-sm text-muted-foreground">
+                          Generating AI recipe...
+                        </p>
                       </div>
                     ) : (
-                      activeRecipe.ingredients.map((ingredient) => (
-                        <div
-                          key={ingredient.id}
-                          className="mb-2 grid grid-cols-12 items-center gap-2 border border-transparent hover:border-muted rounded-md p-1"
-                          draggable
-                          onDragStart={() => handleDragStart(ingredient.id)}
-                          onDragOver={(e) => handleDragOver(e, ingredient.id)}
-                          onDrop={() => handleDrop(ingredient.id)}
-                        >
-                          <div className="col-span-1 flex justify-center cursor-move">
-                            <GripVertical className="h-4 w-4 text-muted-foreground" />
+                      <>
+                        <div className="mb-2 grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground">
+                          <div className="col-span-1"></div>
+                          <div className="col-span-5">Ingredient</div>
+                          <div className="col-span-4">Dosage</div>
+                          <div className="col-span-2">Actions</div>
+                        </div>
+
+                        {activeRecipe.ingredients.length === 0 ? (
+                          <div className="py-8 text-center text-muted-foreground">
+                            No ingredients added yet. Add your first ingredient
+                            below.
                           </div>
+                        ) : (
+                          activeRecipe.ingredients.map((ingredient) => (
+                            <div
+                              key={ingredient.id}
+                              className="mb-2 grid grid-cols-12 items-center gap-2 border border-transparent hover:border-muted rounded-md p-1"
+                              draggable
+                              onDragStart={() => handleDragStart(ingredient.id)}
+                              onDragOver={(e) =>
+                                handleDragOver(e, ingredient.id)
+                              }
+                              onDrop={() => handleDrop(ingredient.id)}
+                            >
+                              <div className="col-span-1 flex justify-center cursor-move">
+                                <GripVertical className="h-4 w-4 text-muted-foreground" />
+                              </div>
+                              <div className="col-span-5">
+                                <Input value={ingredient.name} readOnly />
+                              </div>
+                              <div className="col-span-4 flex items-center gap-2">
+                                <Input
+                                  type="number"
+                                  value={ingredient.dosage}
+                                  onChange={(e) =>
+                                    updateIngredientDosage(
+                                      activeRecipe.id,
+                                      ingredient.id,
+                                      Number.parseFloat(e.target.value) || 0
+                                    )
+                                  }
+                                  min={0}
+                                  step={0.1}
+                                  className="w-full"
+                                />
+                                <span className="text-sm">
+                                  {ingredient.unit}
+                                </span>
+                              </div>
+                              <div className="col-span-2">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() =>
+                                    removeIngredient(
+                                      activeRecipe.id,
+                                      ingredient.id
+                                    )
+                                  }
+                                >
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))
+                        )}
+
+                        {/* Add New Ingredient */}
+                        <div className="mt-4 grid grid-cols-12 items-end gap-2 border-t pt-4">
+                          <div className="col-span-1"></div>
                           <div className="col-span-5">
-                            <Input value={ingredient.name} readOnly />
+                            <Label
+                              htmlFor="new-ingredient"
+                              className="mb-2 block text-xs"
+                            >
+                              New Ingredient
+                            </Label>
+                            <Input
+                              id="new-ingredient"
+                              placeholder="Ingredient name"
+                              value={newIngredientName}
+                              onChange={(e) =>
+                                setNewIngredientName(e.target.value)
+                              }
+                            />
                           </div>
                           <div className="col-span-4 flex items-center gap-2">
-                            <Input
-                              type="number"
-                              value={ingredient.dosage}
-                              onChange={(e) =>
-                                updateIngredientDosage(
-                                  activeRecipe.id,
-                                  ingredient.id,
-                                  Number.parseFloat(e.target.value) || 0
-                                )
-                              }
-                              min={0}
-                              step={0.1}
-                              className="w-full"
-                            />
-                            <span className="text-sm">{ingredient.unit}</span>
+                            <div className="flex-1">
+                              <Label
+                                htmlFor="dosage"
+                                className="mb-2 block text-xs"
+                              >
+                                Dosage
+                              </Label>
+                              <Input
+                                id="dosage"
+                                type="number"
+                                value={newIngredientDosage}
+                                onChange={(e) =>
+                                  setNewIngredientDosage(
+                                    Number.parseFloat(e.target.value) || 0
+                                  )
+                                }
+                                min={0}
+                                step={0.1}
+                              />
+                            </div>
+                            <div className="w-16">
+                              <Label
+                                htmlFor="unit"
+                                className="mb-2 block text-xs"
+                              >
+                                Unit
+                              </Label>
+                              <select
+                                id="unit"
+                                value={newIngredientUnit}
+                                onChange={(e) =>
+                                  setNewIngredientUnit(
+                                    e.target.value as "%" | "ml" | "g"
+                                  )
+                                }
+                                className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                              >
+                                <option value="%">%</option>
+                                <option value="ml">ml</option>
+                                <option value="g">g</option>
+                              </select>
+                            </div>
                           </div>
                           <div className="col-span-2">
                             <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() =>
-                                removeIngredient(activeRecipe.id, ingredient.id)
-                              }
+                              onClick={addIngredient}
+                              className="w-full gap-1"
                             >
-                              <Trash2 className="h-4 w-4 text-destructive" />
+                              <Plus className="h-4 w-4" /> Add
                             </Button>
                           </div>
                         </div>
-                      ))
+                      </>
                     )}
-
-                    {/* Add New Ingredient */}
-                    <div className="mt-4 grid grid-cols-12 items-end gap-2 border-t pt-4">
-                      <div className="col-span-1"></div>
-                      <div className="col-span-5">
-                        <Label
-                          htmlFor="new-ingredient"
-                          className="mb-2 block text-xs"
-                        >
-                          New Ingredient
-                        </Label>
-                        <Input
-                          id="new-ingredient"
-                          placeholder="Ingredient name"
-                          value={newIngredientName}
-                          onChange={(e) => setNewIngredientName(e.target.value)}
-                        />
-                      </div>
-                      <div className="col-span-4 flex items-center gap-2">
-                        <div className="flex-1">
-                          <Label
-                            htmlFor="dosage"
-                            className="mb-2 block text-xs"
-                          >
-                            Dosage
-                          </Label>
-                          <Input
-                            id="dosage"
-                            type="number"
-                            value={newIngredientDosage}
-                            onChange={(e) =>
-                              setNewIngredientDosage(
-                                Number.parseFloat(e.target.value) || 0
-                              )
-                            }
-                            min={0}
-                            step={0.1}
-                          />
-                        </div>
-                        <div className="w-16">
-                          <Label htmlFor="unit" className="mb-2 block text-xs">
-                            Unit
-                          </Label>
-                          <select
-                            id="unit"
-                            value={newIngredientUnit}
-                            onChange={(e) =>
-                              setNewIngredientUnit(
-                                e.target.value as "%" | "ml" | "g"
-                              )
-                            }
-                            className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                          >
-                            <option value="%">%</option>
-                            <option value="ml">ml</option>
-                            <option value="g">g</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div className="col-span-2">
-                        <Button
-                          onClick={addIngredient}
-                          className="w-full gap-1"
-                        >
-                          <Plus className="h-4 w-4" /> Add
-                        </Button>
-                      </div>
-                    </div>
                   </div>
                 </ScrollArea>
               </div>
