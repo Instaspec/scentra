@@ -18,6 +18,8 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar"
 import { set } from 'date-fns'
+import { ToastContainer, toast } from "react-toastify" // Import Toast components
+import "react-toastify/dist/ReactToastify.css" // Import Toast styles
 
 type Message = {
   role: "user" | "assistant"
@@ -81,8 +83,6 @@ export default function RequestPage() {
         ],
       }
 
-      // Add the new chat to the state immediately
-      setRequests((prevRequests) => [...prevRequests, updatedChat])
       setSelectedRequestId(updatedChat.id)
       setMessages(updatedChat.messages)
 
@@ -93,10 +93,6 @@ export default function RequestPage() {
         body: JSON.stringify(updatedChat),
       })
 
-      if (response.ok) {
-        const updatedRequests = await response.json()
-        setRequests(updatedRequests) // Update the state with the backend data
-      }
     } else {
       // Update an existing chat
       const existingChat = requests.find((req) => req.id === selectedRequestId)
@@ -114,11 +110,9 @@ export default function RequestPage() {
         messages: updatedMessages,
       }
 
-      // Update the chat in the state immediately
-      setRequests((prevRequests) =>
-        prevRequests.map((req) => (req.id === selectedRequestId ? updatedChat : req))
-      )
-      setMessages(updatedMessages)
+      // // Update the chat in the state
+      // setRequests(requests.map((req) => (req.id === selectedRequestId ? updatedChat : req)))
+      // setMessages(updatedMessages)
 
       // Save the updated chat to the backend
       const response = await fetch("/api/chats", {
@@ -127,10 +121,10 @@ export default function RequestPage() {
         body: JSON.stringify(updatedChat),
       })
 
-      if (response.ok) {
-        const updatedRequests = await response.json()
-        setRequests(updatedRequests) // Update the state with the backend data
-      }
+      // if (response.ok) {
+      //   const updatedRequests = await response.json()
+      //   setRequests(updatedRequests)
+      // }
     }
 
     setInput("") // Clear input after sending the message
@@ -155,10 +149,8 @@ export default function RequestPage() {
       const finalUpdatedChat = { ...updatedChat, messages: updatedMessages }
 
       // Update the chat with the assistant's response in the state
-      setRequests((prevRequests) =>
-        prevRequests.map((req) => (req.id === updatedChat.id ? finalUpdatedChat : req))
-      )
       setMessages(updatedMessages)
+      setRequests(requests.map((req) => (req.id === updatedChat.id ? finalUpdatedChat : req)))
 
       // Save the updated chat with the assistant's response to the backend
       await fetch("/api/chats", {
@@ -170,6 +162,11 @@ export default function RequestPage() {
       console.error("Failed to fetch OpenAI response")
     }
 
+    // refresh requests
+    const res = await fetch("/api/chats")
+    const data = await res.json()
+    setRequests(data)
+
     setLoading(false) // Reset loading
   }
 
@@ -180,37 +177,81 @@ export default function RequestPage() {
     }
   }
 
-  const sendToFragranceHouse = () => {
-    if (standardizedRequest) {
-      // Create a new request
-      const newRequest = {
-        id: (requests.length + 1).toString(),
-        name: `New Fragrance ${requests.length + 1}`,
-        status: "requested" as const,
-        date: new Date().toISOString(),
-        description: standardizedRequest,
-        messages,
+  const sendToFragranceHouse = async () => {
+    if (selectedRequestId && standardizedRequest) {
+      // Find the selected request
+      const existingRequest = requests.find((req) => req.id === selectedRequestId)
+
+      if (!existingRequest) {
+        console.error(`Request with ID ${selectedRequestId} not found.`)
+        return
       }
 
-      setRequests([...requests, newRequest])
-      alert("Request sent to fragrance house!")
+      // Update the status of the existing request
+      const updatedRequest = {
+        ...existingRequest,
+        status: "requested", // Update the status to "requested"
+        description: standardizedRequest, // Ensure the description is updated
+      }
+
+      // Update the request in the state
+      setRequests((prevRequests) =>
+        prevRequests.map((req) => (req.id === selectedRequestId ? updatedRequest : req))
+      )
+
+      // Save the updated request to the backend
+      const response = await fetch("/api/chats", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedRequest),
+      })
+
+      if (response.ok) {
+        toast.success("Request successfully sent to the fragrance house!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+        })
+      } else {
+        toast.error("Failed to send the request. Please try again.", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+        })
+      }
+    } else {
+      console.error("No request selected or standardized request is missing.")
     }
   }
 
   const selectRequest = (requestId: string) => {
     setSelectedRequestId(requestId)
+    console.log("REQUESTSEDID: ", requestId)
     const selectedRequest = requests.find((req) => req.id === requestId)
+    console.log("SELECTEDREQUEST: ", selectedRequest)
     if (selectedRequest) {
       setMessages(selectedRequest.messages)
-      setStandardizedRequest(selectedRequest.description || null)
+      setStandardizedRequest(selectedRequest?.description)
     } else {
+      console.log("ERRORING!")
       setMessages([])
-      setStandardizedRequest(null)
+      // setStandardizedRequest(null)
     }
   }
 
   return (
     <div className="flex h-screen">
+      {/* Toast Container */}
+      <ToastContainer />
+
       {/* Show loading screen */}
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">

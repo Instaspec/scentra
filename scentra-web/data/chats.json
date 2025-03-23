@@ -3,7 +3,7 @@
     "id": "1",
     "name": "New Fragrance 1",
     "status": "editing",
-    "date": "2025-03-23T01:55:57.456Z",
+    "date": "2025-03-23T02:17:53.314Z",
     "description": "",
     "messages": [
       {
@@ -12,20 +12,20 @@
       },
       {
         "role": "user",
-        "content": "I want refreshin conditioner"
+        "content": "i want refreshin shampoo"
       },
       {
         "role": "assistant",
-        "content": "To refine your description, consider which scents you associate with refreshment outside of citrus. Do you imagine any floral or herbal notes, or have specific fragrances in mind? Think of well-known products or scents that feel refreshing to you!"
+        "content": "To further refine your request, please think about some specific scents that you associate with refreshment. For example, do you prefer lemon, lime, or grapefruit for the top notes? What would you like for the middle notes—perhaps something floral like jasmine or herbal like mint? Finally, how about the base: do you want a clean essence like cedarwood or a creamy scent like coconut? This will help precise the aroma profile."
       }
     ]
   },
   {
     "id": "2",
     "name": "New Fragrance 2",
-    "status": "editing",
-    "date": "2025-03-23T01:57:36.587Z",
-    "description": "",
+    "status": "requested",
+    "date": "2025-03-23T02:19:44.586Z",
+    "description": "A refreshing shampoo with a clean and invigorating fragrance, primarily in the Citrus olfactive family. Top Notes include bright Lemon and zesty Grapefruit for an uplifting initial impression. The Middle Notes consist of crisp Green Apple and a hint of herbal Mint, adding depth and freshness. The Base Notes feature a light touch of Clean Musk for a lasting, airy finish.",
     "messages": [
       {
         "role": "assistant",
@@ -33,20 +33,20 @@
       },
       {
         "role": "user",
-        "content": "i want refreshing shampoo"
+        "content": "want freshing shampoo"
       },
       {
         "role": "assistant",
-        "content": "To enhance your description, please think about the specific notes you'd like to include in your shampoo. Would you prefer it to have a stronger citrus scent, or would you like to balance it with herbal or calming notes? Consider popular shampoos you love for inspiration."
+        "content": "Please confirm if the suggested olfactive family and notes resonate with what you envision for your shampoo. If there are any specific fragrances you enjoy (like a citrus shampoo you’ve used), or particular ingredients you want to include, let me know!"
       }
     ]
   },
   {
     "id": "3",
     "name": "New Fragrance 3",
-    "status": "editing",
-    "date": "2025-03-23T02:00:23.056Z",
-    "description": "",
+    "status": "requested",
+    "date": "2025-03-23T02:21:18.788Z",
+    "description": "A refreshing shampoo with a Citrus olfactive family. The fragrance opens with bright Top Notes of lemon and lime for an energizing first impression, followed by Middle Notes of green tea and cucumber to provide a soothing heart, and rounds out with Base Notes of light musk and marine accord for a clean and refreshing lingering essence.",
     "messages": [
       {
         "role": "assistant",
@@ -58,57 +58,7 @@
       },
       {
         "role": "assistant",
-        "content": "To further refine your fragrance description, please consider the following: 1. Which top notes do you envision? (e.g., Lemon, Bergamot, Mint) 2. What kind of heart/middle notes would you like? (e.g., Lavender, Rosemary) 3. Any specific base notes that should linger or provide depth? (e.g., Cedarwood, Musk) Think about well-known shampoos or fragrances that capture the refreshing quality you're aiming for."
-      }
-    ]
-  },
-  {
-    "id": "4",
-    "name": "New Fragrance 4",
-    "status": "editing",
-    "date": "2025-03-23T02:02:35.838Z",
-    "description": "",
-    "messages": [
-      {
-        "role": "assistant",
-        "content": "What kind of fragrance would you like to create?"
-      },
-      {
-        "role": "user",
-        "content": "i wan refreshing shampoo"
-      },
-      {
-        "role": "assistant",
-        "content": "To enhance your description, think about specific refreshing scents you enjoy. For the Top Notes, consider citrus fruits such as lemon, lime, or grapefruit. For Middle Notes, think of fresh herbs like mint or rosemary. Lastly, for Base Notes, you might want to incorporate a hint of cedar or sandalwood. Provide any specific scents or products you already like to help refine this fragrance profile further."
-      }
-    ]
-  },
-  {
-    "id": "5",
-    "name": "New Fragrance 5",
-    "status": "editing",
-    "date": "2025-03-23T02:06:29.457Z",
-    "description": "",
-    "messages": [
-      {
-        "role": "assistant",
-        "content": "What kind of fragrance would you like to create?"
-      },
-      {
-        "role": "user",
-        "content": "i want refreshing shampoo"
-      },
-      {
-        "role": "assistant",
-        "content": "Consider how you would describe the scent of a refreshing shampoo you like. Think of specific scents that evoke freshness for you, such as fruits or herbs. You can reference well-known products to help specify your vision."
-      },
-      {
-        "role": "user",
-        "content": "I think fruits would be great"
-      },
-      {
-        "role": "assistant",
-        "content": "To refine your description, consider specifying particular fruits you want to include, such as lemon, grapefruit, or mango. Additionally, suggest any other elements like herbal or floral notes that could enhance the freshness."
+        "content": "For a more tailored fragrance, think about specific refreshing scents you like. Consider if you prefer lighter, fruity notes or something more herbal. Feel free to mention any shampoo brands you enjoy that might help us refine your description further."
       }
     ]
   }
