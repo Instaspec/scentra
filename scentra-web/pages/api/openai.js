@@ -12,10 +12,9 @@ export default async function handler(req, res) {
 
   try {
     const { messages } = req.body
-    console.log('MESSAGES: ', messages)
 
     const completion = await client.chat.completions.create({
-      model: 'gpt-3.5-turbo', // Use a valid model name
+      model: 'gpt-4o-mini',
       messages
     })
 
