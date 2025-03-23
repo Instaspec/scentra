@@ -221,110 +221,74 @@ export function RecipeFormulation({
 
     setIsAiGenerating(true);
     // Call API for recommendation based on current description
-    fetch("/api/recommend", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ customerDescription: currentDescription }),
-    })
-      /*
-    {
-    "recommended_oils": [
-        {
-            "name": "Catharanthus roseus nirmal essential oil",
-            "oil_id": "CRESOL147",
-            "match_score": "9",
-            "reasoning": "Bright citrus character that matches the fresh profile requested",
-            "blending_suggestions": [
-                "Pairs well with lavender and ylang-ylang"
-            ]
+    async function fetchRecommendation() {
+      const response = await fetch("/api/recommend", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        {
-            "name": "Centratherum punctatum  essential oil",
-            "oil_id": "CRESOL237",
-            "match_score": "8",
-            "reasoning": "Provides floral notes with calming properties",
-            "blending_suggestions": [
-                "Use as a middle note with bergamot as the top note"
-            ]
-        },
-        {
-            "name": "Mentha arvensis MAS-1 essential oil",
-            "oil_id": "CRESOL10",
-            "match_score": "7",
-            "reasoning": "Adds warm base notes for longevity",
-            "blending_suggestions": [
-                "Use sparingly as a fixative"
-            ]
-        },
-        {
-            "name": "Rosa damascena Noorjahan essential oil",
-            "oil_id": "CRESOL129",
-            "match_score": "6",
-            "reasoning": "Adds warm base notes for longevity",
-            "blending_suggestions": [
-                "Use sparingly as a fixative"
-            ]
-        }
-    ],
-    "blending_notes": "This combination creates a balanced profile with citrus top notes, floral middle notes, and woody base notes",
-    "alternative_suggestions": [
-        "Lemon oil can substitute for bergamot",
-        "Cedarwood can replace sandalwood"
-    ]
-}
-    */
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Recommendation response:", data);
-        // update the active recipe with the recommended oils
-        // extract oil names, and blending notes
-        const recommendedOils = data.recommended_oils;
-        const recommendedOilsNames = recommendedOils.map(
-          (oil: any) => oil.name
-        );
-        const blendingNotes = data.blending_notes;
-        const alternativeSuggestions = data.alternative_suggestions;
-
-        // update the active recipe with the recommended oils
-        setRecipes(
-          recipes.map((recipe) =>
-            recipe.id === activeRecipe.id
-              ? {
-                  ...recipe,
-                  ingredients: recommendedOilsNames.map((oil: string) => ({
-                    id: oil,
-                    name: oil,
-                    dosage: 10,
-                    unit: "%",
-                  })),
-                }
-              : recipe
-          )
-        );
-
-        setNotes(blendingNotes + "\n" + alternativeSuggestions.join("\n"));
-        setIsAiGenerating(false);
-      })
-      .catch((error) => {
-        console.error("Error getting recommendation:", error);
-        setIsAiGenerating(false);
+        body: JSON.stringify({ customerDescription: currentDescription }),
       });
+      const data = await response.json();
+      console.log("Recommendation response:", data);
+      // update the active recipe with the recommended oils
+      // extract oil names, and blending notes
+      const recommendedOils = data.recommended_oils;
+      const recommendedOilsNames = recommendedOils.map((oil: any) => oil.name);
+      const blendingNotes = data.blending_notes;
+      const alternativeSuggestions = data.alternative_suggestions;
 
-    const newRecipe: Recipe = {
-      id: `recipe-${recipes.length + 1}`,
-      name: `${activeRecipe.name.split(" - ")[0]} - v${
-        activeRecipe.version + 1
-      }`,
-      version: activeRecipe.version + 1,
-      date: new Date().toISOString().split("T")[0],
-      ingredients: [], // Empty ingredients list
-      notes: `Version ${activeRecipe.version + 1} started from scratch`,
-    };
+      // Generate random dosages that sum up to a value between 15-35%
+      const totalDosage = Math.floor(Math.random() * (35 - 15 + 1)) + 15; // Random value between 15-35
+      // Initialize an empty array to store dosages
+      const dosages: number[] = [];
 
-    setRecipes([...recipes, newRecipe]);
-    setActiveRecipeId(newRecipe.id);
+      // Calculate dosages one by one to avoid referencing before definition
+      for (let index = 0; index < recommendedOils.length; index++) {
+        // For all but the last item, generate a random proportion
+        if (index < recommendedOils.length - 1) {
+          const remaining = recommendedOils.length - index;
+          // Ensure we don't use up too much for early items
+          const maxForThis = (totalDosage * 0.7) / remaining;
+          dosages.push(Math.round(Math.random() * maxForThis * 10) / 10);
+        } else {
+          // Last item gets whatever is left to ensure total adds up exactly
+          const used = dosages.reduce((sum, value) => sum + value, 0);
+          dosages.push(Math.round((totalDosage - used) * 10) / 10);
+        }
+      }
+
+      // Create a new recipe with recommended oils
+      const newRecipe: Recipe = {
+        id: `ai-recipe-${recipes.length + 1}`,
+        name: `${activeRecipe.name.split(" - ")[0]} - v${
+          activeRecipe.version + 1
+        }`,
+        version: activeRecipe.version + 1,
+        date: new Date().toISOString().split("T")[0],
+        ingredients: recommendedOils.map((oil: any) => ({
+          id: oil.oil_id,
+          name: oil.name,
+          dosage: dosages[recommendedOils.indexOf(oil)],
+          unit: "%",
+          reasoning: oil.reasoning,
+          blendingSuggestions: oil.blending_suggestions,
+        })),
+        notes: `${blendingNotes}\n\nAlternative suggestions:\n${alternativeSuggestions.join(
+          "\n"
+        )}`,
+      };
+
+      // Add the new recipe to the recipes array
+      setRecipes([...recipes, newRecipe]);
+      setActiveRecipeId(newRecipe.id);
+      console.log(`new recipe: ${JSON.stringify(newRecipe)}`);
+
+      setNotes(blendingNotes + "\n" + alternativeSuggestions.join("\n"));
+      setIsAiGenerating(false);
+    }
+
+    fetchRecommendation();
     setIsNewVersionDialogOpen(false);
   }, [activeRecipe, currentDescription, recipes]);
 
@@ -383,7 +347,6 @@ export function RecipeFormulation({
         }
         const data = await response.json();
         setChatLog(data);
-        console.log(data);
       } catch (error) {
         console.error("Error loading chat log:", error);
       }
@@ -396,7 +359,6 @@ export function RecipeFormulation({
     if (chatLog.length > 0) {
       for (const chat of chatLog) {
         if (chat.id === selectedRequest) {
-          console.log(`chat: ${JSON.stringify(chat)}`);
           setSelectedChat(chat);
         }
       }
@@ -412,6 +374,7 @@ export function RecipeFormulation({
       ) {
         // If the chat has a requested status and description, set the current description
         setCurrentDescription(selectedChat.description);
+        console.log(`current description: ${selectedChat.description}`);
       } else {
         // Otherwise, set an empty description
         setCurrentDescription("");
