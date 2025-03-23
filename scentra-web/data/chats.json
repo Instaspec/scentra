@@ -1,31 +1,31 @@
 [
   {
     "id": "1",
-    "name": "Sample Chat",
-    "date": "2023-10-01T12:00:00Z",
-    "description": "Sample request",
+    "name": "New Fragrance 1",
     "status": "editing",
+    "date": "2025-03-23T02:17:53.314Z",
+    "description": "",
     "messages": [
       {
         "role": "assistant",
-        "content": "Hello, I need a custom fragrance."
+        "content": "What kind of fragrance would you like to create?"
       },
       {
         "role": "user",
-        "content": "hi"
+        "content": "i want refreshin shampoo"
       },
       {
         "role": "assistant",
-        "content": "Hello! How can I assist you today? If you’re looking for help with creating a custom fragrance, I’d love to help with that!"
+        "content": "To further refine your request, please think about some specific scents that you associate with refreshment. For example, do you prefer lemon, lime, or grapefruit for the top notes? What would you like for the middle notes—perhaps something floral like jasmine or herbal like mint? Finally, how about the base: do you want a clean essence like cedarwood or a creamy scent like coconut? This will help precise the aroma profile."
       }
     ]
   },
   {
     "id": "2",
     "name": "New Fragrance 2",
-    "status": "editing",
-    "date": "2025-03-23T01:26:39.782Z",
-    "description": "",
+    "status": "requested",
+    "date": "2025-03-23T02:19:44.586Z",
+    "description": "A refreshing shampoo with a clean and invigorating fragrance, primarily in the Citrus olfactive family. Top Notes include bright Lemon and zesty Grapefruit for an uplifting initial impression. The Middle Notes consist of crisp Green Apple and a hint of herbal Mint, adding depth and freshness. The Base Notes feature a light touch of Clean Musk for a lasting, airy finish.",
     "messages": [
       {
         "role": "assistant",
@@ -33,24 +33,20 @@
       },
       {
         "role": "user",
-        "content": "I want something a something refreshing"
-      },
-      {
-        "role": "user",
-        "content": "I want something a something refreshing"
+        "content": "want freshing shampoo"
       },
       {
         "role": "assistant",
-        "content": "Great! To create a refreshing fragrance, we should start by identifying the product type. Are you looking to create a perfume, shampoo, candle, or something else?\n\nOnce we have that, we can explore the olfactive families that can give you that refreshing quality. Common choices for refreshing scents include:\n\n- **Citrus:** Bright and zesty (think lemon, lime, orange).\n- **Floral:** Light and uplifting (consider clean florals like lily or jasmine).\n- **Woody:** Earthy and grounding (think cedarwood or sandalwood).\n- **Herbal:** Invigorating and aromatic (like mint or basil).\n\nWhich product type are you interested in, and which olfactive family do you think aligns best with your idea of refreshing?"
+        "content": "Please confirm if the suggested olfactive family and notes resonate with what you envision for your shampoo. If there are any specific fragrances you enjoy (like a citrus shampoo you’ve used), or particular ingredients you want to include, let me know!"
       }
     ]
   },
   {
     "id": "3",
     "name": "New Fragrance 3",
-    "status": "editing",
-    "date": "2025-03-23T01:36:27.656Z",
-    "description": "",
+    "status": "requested",
+    "date": "2025-03-23T02:21:18.788Z",
+    "description": "A refreshing shampoo with a Citrus olfactive family. The fragrance opens with bright Top Notes of lemon and lime for an energizing first impression, followed by Middle Notes of green tea and cucumber to provide a soothing heart, and rounds out with Base Notes of light musk and marine accord for a clean and refreshing lingering essence.",
     "messages": [
       {
         "role": "assistant",
@@ -58,49 +54,11 @@
       },
       {
         "role": "user",
-        "content": "I want a shampoo that is refreshing"
-      }
-    ]
-  },
-  {
-    "id": "4",
-    "name": "New Fragrance 4",
-    "status": "editing",
-    "date": "2025-03-23T01:38:48.923Z",
-    "description": "",
-    "messages": [
-      {
-        "role": "assistant",
-        "content": "What kind of fragrance would you like to create?"
-      },
-      {
-        "role": "user",
-        "content": "I was refreshing shampoo"
+        "content": "i want refreshing shampoo"
       },
       {
         "role": "assistant",
-        "content": "To refine your aroma description, think about the specific scents you associate with being refreshing. Consider familiar scents like lemon, mint, or apple that evoke freshness. Additionally, think about whether you prefer the fragrance to emphasize lighter top notes, a central heart, or if you want it grounded with base notes for longevity."
-      }
-    ]
-  },
-  {
-    "id": "5",
-    "name": "New Fragrance 5",
-    "status": "editing",
-    "date": "2025-03-23T01:43:29.201Z",
-    "description": "",
-    "messages": [
-      {
-        "role": "assistant",
-        "content": "What kind of fragrance would you like to create?"
-      },
-      {
-        "role": "user",
-        "content": "We are developing a luxury hand cream targeted at professional women aged 25-45 who seek elegance and self-care in their daily routine. The fragrance should belong to the Floral-Woody olfactive family, with top notes of bergamot and pear, a heart of jasmine, rose, and orange blossom, and a base of sandalwood, musk, and vanilla. We want it to evoke a sense of sophisticated confidence and warmth, similar to Jo Malone’s Peony & Blush Suede but with a richer woody depth.  The formulation should be light yet long-lasting, with a concentration suitable for a skincare product. It must be free from parabens and phthalates while adhering to IFRA safety standards. Our key differentiator is the use of sustainably sourced ingredients, positioning us as an eco-luxury brand. Competitor references include Aesop, L’Occitane, and Byredo.  We have a budget of $30,000 for fragrance development and need the final formulation ready within 8 weeks for packaging and production."
-      },
-      {
-        "role": "assistant",
-        "content": "Ensure that each note is distinctly expressed in the fragrance development process. Consider referencing similar products closely for inspiration and to align your scent with the expectations of your target demographic. Additionally, confirm the concentration level for optimal performance in a hand cream and clarify your priority within the ecological aspects of the fragrance to enhance your branding."
+        "content": "For a more tailored fragrance, think about specific refreshing scents you like. Consider if you prefer lighter, fruity notes or something more herbal. Feel free to mention any shampoo brands you enjoy that might help us refine your description further."
       }
     ]
   }
