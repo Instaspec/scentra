@@ -1,17 +1,29 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Beaker, Save, Plus, Trash2, Copy, GripVertical } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState } from "react";
+import { Beaker, Save, Plus, Trash2, Copy, GripVertical } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -20,32 +32,45 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
+import { Oil } from "@/lib/types";
 
 type Ingredient = {
-  id: string
-  name: string
-  dosage: number
-  unit: "%" | "ml" | "g"
-}
+  id: string;
+  name: string;
+  dosage: number;
+  unit: "%" | "ml" | "g";
+};
 
 type Recipe = {
-  id: string
-  name: string
-  version: number
-  date: string
-  ingredients: Ingredient[]
-  notes: string
-}
+  id: string;
+  name: string;
+  version: number;
+  date: string;
+  ingredients: Ingredient[];
+  notes: string;
+};
 
-export function RecipeFormulation() {
-  const [activeRecipeId, setActiveRecipeId] = useState("recipe-1")
-  const [notes, setNotes] = useState("")
-  const [newIngredientName, setNewIngredientName] = useState("")
-  const [newIngredientDosage, setNewIngredientDosage] = useState(1)
-  const [newIngredientUnit, setNewIngredientUnit] = useState<"%" | "ml" | "g">("%")
-  const [draggedIngredient, setDraggedIngredient] = useState<string | null>(null)
-  const [isNewVersionDialogOpen, setIsNewVersionDialogOpen] = useState(false)
+type RecipeFormulationProps = {
+  oils: Oil[];
+  isLoadingOils: boolean;
+};
+
+export function RecipeFormulation({
+  oils,
+  isLoadingOils,
+}: RecipeFormulationProps) {
+  const [activeRecipeId, setActiveRecipeId] = useState("recipe-1");
+  const [notes, setNotes] = useState("");
+  const [newIngredientName, setNewIngredientName] = useState("");
+  const [newIngredientDosage, setNewIngredientDosage] = useState(1);
+  const [newIngredientUnit, setNewIngredientUnit] = useState<"%" | "ml" | "g">(
+    "%"
+  );
+  const [draggedIngredient, setDraggedIngredient] = useState<string | null>(
+    null
+  );
+  const [isNewVersionDialogOpen, setIsNewVersionDialogOpen] = useState(false);
 
   const [recipes, setRecipes] = useState<Recipe[]>([
     {
@@ -62,7 +87,8 @@ export function RecipeFormulation() {
         { id: "6", name: "Orange blossom water", dosage: 4, unit: "%" },
         { id: "7", name: "Mandarin oil", dosage: 10, unit: "%" },
       ],
-      notes: "Initial formulation based on client's request for a fresh citrus scent with floral undertones.",
+      notes:
+        "Initial formulation based on client's request for a fresh citrus scent with floral undertones.",
     },
     {
       id: "recipe-2",
@@ -79,123 +105,154 @@ export function RecipeFormulation() {
         { id: "7", name: "Mandarin oil", dosage: 12, unit: "%" },
         { id: "8", name: "Lemongrass oil", dosage: 4, unit: "%" },
       ],
-      notes: "Increased citrus notes and added lemongrass for better longevity.",
+      notes:
+        "Increased citrus notes and added lemongrass for better longevity.",
     },
-  ])
+  ]);
 
-  const activeRecipe = recipes.find((recipe) => recipe.id === activeRecipeId)
+  const activeRecipe = recipes.find((recipe) => recipe.id === activeRecipeId);
 
   const addIngredient = () => {
-    if (!newIngredientName.trim() || !activeRecipe) return
+    if (!newIngredientName.trim() || !activeRecipe) return;
 
     const newIngredient: Ingredient = {
       id: Date.now().toString(),
       name: newIngredientName,
       dosage: newIngredientDosage,
       unit: newIngredientUnit,
-    }
+    };
 
     setRecipes(
       recipes.map((recipe) =>
-        recipe.id === activeRecipe.id ? { ...recipe, ingredients: [...recipe.ingredients, newIngredient] } : recipe,
-      ),
-    )
+        recipe.id === activeRecipe.id
+          ? { ...recipe, ingredients: [...recipe.ingredients, newIngredient] }
+          : recipe
+      )
+    );
 
-    setNewIngredientName("")
-    setNewIngredientDosage(1)
-  }
+    setNewIngredientName("");
+    setNewIngredientDosage(1);
+  };
 
   const removeIngredient = (recipeId: string, ingredientId: string) => {
     setRecipes(
       recipes.map((recipe) =>
         recipe.id === recipeId
-          ? { ...recipe, ingredients: recipe.ingredients.filter((i) => i.id !== ingredientId) }
-          : recipe,
-      ),
-    )
-  }
+          ? {
+              ...recipe,
+              ingredients: recipe.ingredients.filter(
+                (i) => i.id !== ingredientId
+              ),
+            }
+          : recipe
+      )
+    );
+  };
 
-  const updateIngredientDosage = (recipeId: string, ingredientId: string, dosage: number) => {
+  const updateIngredientDosage = (
+    recipeId: string,
+    ingredientId: string,
+    dosage: number
+  ) => {
     setRecipes(
       recipes.map((recipe) =>
         recipe.id === recipeId
           ? {
               ...recipe,
-              ingredients: recipe.ingredients.map((i) => (i.id === ingredientId ? { ...i, dosage } : i)),
+              ingredients: recipe.ingredients.map((i) =>
+                i.id === ingredientId ? { ...i, dosage } : i
+              ),
             }
-          : recipe,
-      ),
-    )
-  }
+          : recipe
+      )
+    );
+  };
 
   const createNewVersionFromCurrent = () => {
-    if (!activeRecipe) return
+    if (!activeRecipe) return;
 
     const newRecipe: Recipe = {
       id: `recipe-${recipes.length + 1}`,
-      name: `${activeRecipe.name.split(" - ")[0]} - v${activeRecipe.version + 1}`,
+      name: `${activeRecipe.name.split(" - ")[0]} - v${
+        activeRecipe.version + 1
+      }`,
       version: activeRecipe.version + 1,
       date: new Date().toISOString().split("T")[0],
       ingredients: [...activeRecipe.ingredients],
-      notes: `Version ${activeRecipe.version + 1} based on ${activeRecipe.name}`,
-    }
+      notes: `Version ${activeRecipe.version + 1} based on ${
+        activeRecipe.name
+      }`,
+    };
 
-    setRecipes([...recipes, newRecipe])
-    setActiveRecipeId(newRecipe.id)
-    setIsNewVersionDialogOpen(false)
-  }
+    setRecipes([...recipes, newRecipe]);
+    setActiveRecipeId(newRecipe.id);
+    setIsNewVersionDialogOpen(false);
+  };
 
   const createNewVersionFromScratch = () => {
-    if (!activeRecipe) return
+    if (!activeRecipe) return;
 
     const newRecipe: Recipe = {
       id: `recipe-${recipes.length + 1}`,
-      name: `${activeRecipe.name.split(" - ")[0]} - v${activeRecipe.version + 1}`,
+      name: `${activeRecipe.name.split(" - ")[0]} - v${
+        activeRecipe.version + 1
+      }`,
       version: activeRecipe.version + 1,
       date: new Date().toISOString().split("T")[0],
       ingredients: [], // Empty ingredients list
       notes: `Version ${activeRecipe.version + 1} started from scratch`,
-    }
+    };
 
-    setRecipes([...recipes, newRecipe])
-    setActiveRecipeId(newRecipe.id)
-    setIsNewVersionDialogOpen(false)
-  }
+    setRecipes([...recipes, newRecipe]);
+    setActiveRecipeId(newRecipe.id);
+    setIsNewVersionDialogOpen(false);
+  };
 
   const calculateTotal = (ingredients: Ingredient[]) => {
-    return ingredients.filter((i) => i.unit === "%").reduce((sum, ingredient) => sum + ingredient.dosage, 0)
-  }
+    return ingredients
+      .filter((i) => i.unit === "%")
+      .reduce((sum, ingredient) => sum + ingredient.dosage, 0);
+  };
 
   // Drag and drop functionality
   const handleDragStart = (ingredientId: string) => {
-    setDraggedIngredient(ingredientId)
-  }
+    setDraggedIngredient(ingredientId);
+  };
 
   const handleDragOver = (e: React.DragEvent, targetId: string) => {
-    e.preventDefault()
-    if (!draggedIngredient || draggedIngredient === targetId) return
-  }
+    e.preventDefault();
+    if (!draggedIngredient || draggedIngredient === targetId) return;
+  };
 
   const handleDrop = (targetId: string) => {
-    if (!draggedIngredient || !activeRecipe || draggedIngredient === targetId) return
+    if (!draggedIngredient || !activeRecipe || draggedIngredient === targetId)
+      return;
 
-    const draggedIndex = activeRecipe.ingredients.findIndex((i) => i.id === draggedIngredient)
-    const targetIndex = activeRecipe.ingredients.findIndex((i) => i.id === targetId)
+    const draggedIndex = activeRecipe.ingredients.findIndex(
+      (i) => i.id === draggedIngredient
+    );
+    const targetIndex = activeRecipe.ingredients.findIndex(
+      (i) => i.id === targetId
+    );
 
-    if (draggedIndex === -1 || targetIndex === -1) return
+    if (draggedIndex === -1 || targetIndex === -1) return;
 
     // Create a new array with the reordered ingredients
-    const newIngredients = [...activeRecipe.ingredients]
-    const [movedItem] = newIngredients.splice(draggedIndex, 1)
-    newIngredients.splice(targetIndex, 0, movedItem)
+    const newIngredients = [...activeRecipe.ingredients];
+    const [movedItem] = newIngredients.splice(draggedIndex, 1);
+    newIngredients.splice(targetIndex, 0, movedItem);
 
     // Update the recipes state
     setRecipes(
-      recipes.map((recipe) => (recipe.id === activeRecipe.id ? { ...recipe, ingredients: newIngredients } : recipe)),
-    )
+      recipes.map((recipe) =>
+        recipe.id === activeRecipe.id
+          ? { ...recipe, ingredients: newIngredients }
+          : recipe
+      )
+    );
 
-    setDraggedIngredient(null)
-  }
+    setDraggedIngredient(null);
+  };
 
   return (
     <div className="space-y-6 w-full">
@@ -207,7 +264,10 @@ export function RecipeFormulation() {
               <Beaker className="h-5 w-5" />
               Recipe Formulation
             </CardTitle>
-            <Dialog open={isNewVersionDialogOpen} onOpenChange={setIsNewVersionDialogOpen}>
+            <Dialog
+              open={isNewVersionDialogOpen}
+              onOpenChange={setIsNewVersionDialogOpen}
+            >
               <DialogTrigger asChild>
                 <Button className="gap-2">
                   <Copy className="h-4 w-4" /> Create New Version
@@ -216,7 +276,9 @@ export function RecipeFormulation() {
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Create New Recipe Version</DialogTitle>
-                  <DialogDescription>Choose how you want to create the new recipe version.</DialogDescription>
+                  <DialogDescription>
+                    Choose how you want to create the new recipe version.
+                  </DialogDescription>
                 </DialogHeader>
                 <div className="grid grid-cols-2 gap-4 py-4">
                   <Button
@@ -237,14 +299,20 @@ export function RecipeFormulation() {
                   </Button>
                 </div>
                 <DialogFooter>
-                  <Button variant="secondary" onClick={() => setIsNewVersionDialogOpen(false)}>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setIsNewVersionDialogOpen(false)}
+                  >
                     Cancel
                   </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
           </div>
-          <CardDescription>Develop and refine fragrance recipes with precise ingredient dosages.</CardDescription>
+          <CardDescription>
+            Develop and refine fragrance recipes with precise ingredient
+            dosages.
+          </CardDescription>
 
           <div className="mt-4 flex items-center gap-4">
             <Label htmlFor="recipe-version" className="text-sm font-medium">
@@ -272,7 +340,9 @@ export function RecipeFormulation() {
               <div className="rounded-md border">
                 <div className="flex items-center justify-between bg-muted p-3">
                   <h3 className="font-medium">Ingredients</h3>
-                  <Badge variant="outline">Total: {calculateTotal(activeRecipe.ingredients)}%</Badge>
+                  <Badge variant="outline">
+                    Total: {calculateTotal(activeRecipe.ingredients)}%
+                  </Badge>
                 </div>
                 <ScrollArea className="h-[300px]">
                   <div className="p-3">
@@ -285,7 +355,8 @@ export function RecipeFormulation() {
 
                     {activeRecipe.ingredients.length === 0 ? (
                       <div className="py-8 text-center text-muted-foreground">
-                        No ingredients added yet. Add your first ingredient below.
+                        No ingredients added yet. Add your first ingredient
+                        below.
                       </div>
                     ) : (
                       activeRecipe.ingredients.map((ingredient) => (
@@ -311,7 +382,7 @@ export function RecipeFormulation() {
                                 updateIngredientDosage(
                                   activeRecipe.id,
                                   ingredient.id,
-                                  Number.parseFloat(e.target.value) || 0,
+                                  Number.parseFloat(e.target.value) || 0
                                 )
                               }
                               min={0}
@@ -324,7 +395,9 @@ export function RecipeFormulation() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => removeIngredient(activeRecipe.id, ingredient.id)}
+                              onClick={() =>
+                                removeIngredient(activeRecipe.id, ingredient.id)
+                              }
                             >
                               <Trash2 className="h-4 w-4 text-destructive" />
                             </Button>
@@ -337,7 +410,10 @@ export function RecipeFormulation() {
                     <div className="mt-4 grid grid-cols-12 items-end gap-2 border-t pt-4">
                       <div className="col-span-1"></div>
                       <div className="col-span-5">
-                        <Label htmlFor="new-ingredient" className="mb-2 block text-xs">
+                        <Label
+                          htmlFor="new-ingredient"
+                          className="mb-2 block text-xs"
+                        >
                           New Ingredient
                         </Label>
                         <Input
@@ -349,14 +425,21 @@ export function RecipeFormulation() {
                       </div>
                       <div className="col-span-4 flex items-center gap-2">
                         <div className="flex-1">
-                          <Label htmlFor="dosage" className="mb-2 block text-xs">
+                          <Label
+                            htmlFor="dosage"
+                            className="mb-2 block text-xs"
+                          >
                             Dosage
                           </Label>
                           <Input
                             id="dosage"
                             type="number"
                             value={newIngredientDosage}
-                            onChange={(e) => setNewIngredientDosage(Number.parseFloat(e.target.value) || 0)}
+                            onChange={(e) =>
+                              setNewIngredientDosage(
+                                Number.parseFloat(e.target.value) || 0
+                              )
+                            }
                             min={0}
                             step={0.1}
                           />
@@ -368,7 +451,11 @@ export function RecipeFormulation() {
                           <select
                             id="unit"
                             value={newIngredientUnit}
-                            onChange={(e) => setNewIngredientUnit(e.target.value as "%" | "ml" | "g")}
+                            onChange={(e) =>
+                              setNewIngredientUnit(
+                                e.target.value as "%" | "ml" | "g"
+                              )
+                            }
                             className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                           >
                             <option value="%">%</option>
@@ -378,7 +465,10 @@ export function RecipeFormulation() {
                         </div>
                       </div>
                       <div className="col-span-2">
-                        <Button onClick={addIngredient} className="w-full gap-1">
+                        <Button
+                          onClick={addIngredient}
+                          className="w-full gap-1"
+                        >
                           <Plus className="h-4 w-4" /> Add
                         </Button>
                       </div>
@@ -397,7 +487,13 @@ export function RecipeFormulation() {
                   placeholder="Add notes about this recipe version..."
                   value={activeRecipe.notes}
                   onChange={(e) => {
-                    setRecipes(recipes.map((r) => (r.id === activeRecipe.id ? { ...r, notes: e.target.value } : r)))
+                    setRecipes(
+                      recipes.map((r) =>
+                        r.id === activeRecipe.id
+                          ? { ...r, notes: e.target.value }
+                          : r
+                      )
+                    );
                   }}
                   className="min-h-[100px]"
                 />
@@ -417,7 +513,9 @@ export function RecipeFormulation() {
       <Card className="w-full">
         <CardHeader>
           <CardTitle>Development Notes</CardTitle>
-          <CardDescription>Add your notes about the recipe formulation process.</CardDescription>
+          <CardDescription>
+            Add your notes about the recipe formulation process.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Textarea
@@ -430,6 +528,5 @@ export function RecipeFormulation() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
-

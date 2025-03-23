@@ -1,35 +1,55 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Check, FileText, Search } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
+import { useState } from "react";
+import { Check, FileText, Search } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Oil } from "@/lib/types";
 
 type ReferenceProduct = {
-  id: string
-  name: string
-  description: string
-  compounds: string[]
-  ingredients: string[]
-  selected: boolean
-}
+  id: string;
+  name: string;
+  description: string;
+  compounds: string[];
+  ingredients: string[];
+  selected: boolean;
+};
 
-export function ReferenceProductSelection() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [notes, setNotes] = useState("")
+type ReferenceProductSelectionProps = {
+  oils: Oil[];
+  isLoadingOils: boolean;
+};
+
+export function ReferenceProductSelection({
+  oils,
+  isLoadingOils,
+}: ReferenceProductSelectionProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [notes, setNotes] = useState("");
   const [products, setProducts] = useState<ReferenceProduct[]>([
     {
       id: "1",
       name: "Citrus Splash",
       description: "Bright and refreshing citrus blend with bergamot and lemon",
       compounds: ["Limonene", "Linalool", "Citral", "Geraniol"],
-      ingredients: ["Bergamot oil", "Lemon oil", "Orange peel extract", "Neroli oil"],
+      ingredients: [
+        "Bergamot oil",
+        "Lemon oil",
+        "Orange peel extract",
+        "Neroli oil",
+      ],
       selected: false,
     },
     {
@@ -37,7 +57,12 @@ export function ReferenceProductSelection() {
       name: "Summer Breeze",
       description: "Light floral with citrus undertones, medium intensity",
       compounds: ["Linalool", "Citronellol", "Geraniol", "Limonene"],
-      ingredients: ["Bergamot oil", "Rose extract", "Jasmine absolute", "Lemon oil"],
+      ingredients: [
+        "Bergamot oil",
+        "Rose extract",
+        "Jasmine absolute",
+        "Lemon oil",
+      ],
       selected: false,
     },
     {
@@ -45,7 +70,12 @@ export function ReferenceProductSelection() {
       name: "Morning Zest",
       description: "Energizing citrus with green notes, long-lasting",
       compounds: ["Limonene", "Pinene", "Linalyl acetate", "Terpineol"],
-      ingredients: ["Lemon oil", "Petitgrain oil", "Grapefruit oil", "Green tea extract"],
+      ingredients: [
+        "Lemon oil",
+        "Petitgrain oil",
+        "Grapefruit oil",
+        "Green tea extract",
+      ],
       selected: false,
     },
     {
@@ -53,24 +83,39 @@ export function ReferenceProductSelection() {
       name: "Citrus Garden",
       description: "Balanced citrus and herbal blend with medium projection",
       compounds: ["Limonene", "Linalool", "Terpinene", "Caryophyllene"],
-      ingredients: ["Bergamot oil", "Lemon verbena", "Mandarin oil", "Basil extract"],
+      ingredients: [
+        "Bergamot oil",
+        "Lemon verbena",
+        "Mandarin oil",
+        "Basil extract",
+      ],
       selected: false,
     },
-  ])
+  ]);
 
   const filteredProducts = products.filter(
     (product) =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.compounds.some((c) => c.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      product.ingredients.some((i) => i.toLowerCase().includes(searchTerm.toLowerCase())),
-  )
+      product.compounds.some((c) =>
+        c.toLowerCase().includes(searchTerm.toLowerCase())
+      ) ||
+      product.ingredients.some((i) =>
+        i.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+  );
 
   const toggleProductSelection = (id: string) => {
-    setProducts(products.map((product) => (product.id === id ? { ...product, selected: !product.selected } : product)))
-  }
+    setProducts(
+      products.map((product) =>
+        product.id === id
+          ? { ...product, selected: !product.selected }
+          : product
+      )
+    );
+  };
 
-  const selectedProducts = products.filter((p) => p.selected)
+  const selectedProducts = products.filter((p) => p.selected);
 
   return (
     <div className="space-y-6 w-full">
@@ -81,12 +126,15 @@ export function ReferenceProductSelection() {
             <Check className="h-5 w-5" />
             Selected Reference Products
           </CardTitle>
-          <CardDescription>Products selected as reference for the new fragrance development.</CardDescription>
+          <CardDescription>
+            Products selected as reference for the new fragrance development.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {selectedProducts.length === 0 ? (
             <div className="rounded-md bg-muted p-4 text-center text-sm text-muted-foreground">
-              No reference products selected yet. Select products from the list below.
+              No reference products selected yet. Select products from the list
+              below.
             </div>
           ) : (
             <div className="flex flex-wrap gap-2">
@@ -107,7 +155,9 @@ export function ReferenceProductSelection() {
             <FileText className="h-5 w-5" />
             Reference Products
           </CardTitle>
-          <CardDescription>Select internal products that match the client's description.</CardDescription>
+          <CardDescription>
+            Select internal products that match the client's description.
+          </CardDescription>
           <div className="mt-2 flex items-center gap-2">
             <Search className="h-4 w-4 text-muted-foreground" />
             <Input
@@ -138,16 +188,23 @@ export function ReferenceProductSelection() {
                           </Badge>
                         )}
                       </div>
-                      <p className="mt-1 text-sm text-muted-foreground">{product.description}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {product.description}
+                      </p>
                     </div>
-                    <Checkbox checked={product.selected} onCheckedChange={() => toggleProductSelection(product.id)} />
+                    <Checkbox
+                      checked={product.selected}
+                      onCheckedChange={() => toggleProductSelection(product.id)}
+                    />
                   </div>
 
                   <Separator className="my-3" />
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <h4 className="mb-2 text-sm font-medium">Chemical Compounds</h4>
+                      <h4 className="mb-2 text-sm font-medium">
+                        Chemical Compounds
+                      </h4>
                       <ul className="space-y-1 text-xs">
                         {product.compounds.map((compound) => (
                           <li key={compound} className="text-muted-foreground">
@@ -157,10 +214,15 @@ export function ReferenceProductSelection() {
                       </ul>
                     </div>
                     <div>
-                      <h4 className="mb-2 text-sm font-medium">Raw Ingredients</h4>
+                      <h4 className="mb-2 text-sm font-medium">
+                        Raw Ingredients
+                      </h4>
                       <ul className="space-y-1 text-xs">
                         {product.ingredients.map((ingredient) => (
-                          <li key={ingredient} className="text-muted-foreground">
+                          <li
+                            key={ingredient}
+                            className="text-muted-foreground"
+                          >
                             {ingredient}
                           </li>
                         ))}
@@ -178,7 +240,9 @@ export function ReferenceProductSelection() {
       <Card className="w-full">
         <CardHeader>
           <CardTitle>Reference Selection Notes</CardTitle>
-          <CardDescription>Add your notes about the selected reference products.</CardDescription>
+          <CardDescription>
+            Add your notes about the selected reference products.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Textarea
@@ -191,6 +255,5 @@ export function ReferenceProductSelection() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
-
