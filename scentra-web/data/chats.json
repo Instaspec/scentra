@@ -1,7 +1,7 @@
 [
   {
     "id": "1",
-    "name": "Hotel Lounge-Like Diffuser",
+    "name": "Hotel-Like Diffuser",
     "status": "requested",
     "date": "2025-03-23T03:43:24.431Z",
     "description": "A soothing diffuser fragrance inspired by a hotel lounge, featuring refreshing Top Notes of Bergamot, soft Middle Notes of subtle floral and green elements, and a grounding Base Note of Cedar wood, providing a pleasant and calming atmosphere without being overpowering.",
@@ -33,6 +33,35 @@
       {
         "role": "assistant",
         "content": "It's clear you have a solid idea! If you're happy with the description, please press the 'Send Request' button to submit your fragrance request."
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "name": "Herbal Bar Soap",
+    "status": "requested",
+    "date": "2025-03-23T04:02:33.040Z",
+    "description": "A bar soap with a mild, soothing aroma featuring an Herbal olfactive family. Top Notes of eucalyptus provide an invigorating opening, complemented by Middle Notes of aromatic herbs, creating a calming and fresh heart. Base Notes of sandalwood add warmth and depth, ensuring a lingering essence that is comforting and grounding.",
+    "messages": [
+      {
+        "role": "assistant",
+        "content": "What kind of fragrance would you like to create?"
+      },
+      {
+        "role": "user",
+        "content": "I would like to make a bar soap with soothing and mild scent. maybe some hint of aromatic smell."
+      },
+      {
+        "role": "assistant",
+        "content": "To refine your fragrance description, consider specifying an olfactive family such as Floral, Herbal, or Citrus. Additionally, think about which specific scents you find soothing (like lavender, chamomile, or eucalyptus) for the Top Notes, which aromas represent the heart of your scent idea for the Middle Notes, and what lingering scents you’d like in the Base Notes, such as sandalwood or vanilla. Reference any well-known products that fit your idea, like a lavender soap or herbal shampoo."
+      },
+      {
+        "role": "user",
+        "content": "Herbal, eucalyptus, and sandalwood would be nice"
+      },
+      {
+        "role": "assistant",
+        "content": "This description captures your vision well. If you're happy with it, feel free to press the 'Send Request' button to submit your fragrance concept."
       }
     ]
   }

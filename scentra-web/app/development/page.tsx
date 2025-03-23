@@ -36,6 +36,7 @@ export default function DevelopmentPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [oils, setOils] = useState<Record<string, Oil>>({});
   const [isLoadingOils, setIsLoadingOils] = useState(true);
+  const [currentDescription, setCurrentDescription] = useState<string>("");
   const [requests, setRequests] = useState<Request[]>([
     {
       id: "1",
@@ -84,17 +85,25 @@ export default function DevelopmentPage() {
           id: chat.id,
           name: chat.name,
           status: chat.status === "requested" ? "pending" : chat.status,
+          description: chat.description,
           date: chat.date,
         }));
 
         setRequests(formattedRequests);
+        if (formattedRequests.length > 0) {
+          for (const request of formattedRequests) {
+            if (request.id === selectedRequest) {
+              setCurrentDescription(request.description);
+            }
+          }
+        }
       } catch (error) {
         console.error("Error fetching chats:", error);
       }
     };
 
     fetchChats();
-  }, []);
+  }, [selectedRequest]);
 
   useEffect(() => {
     const _loadOils = async () => {
@@ -205,7 +214,9 @@ export default function DevelopmentPage() {
         {/* Step Content - Full Width Container */}
         <div className="flex-1 overflow-auto p-6 w-full max-w-none">
           <div className="mx-auto w-full max-w-none">
-            {currentStep === 0 && <ClientRequestReview />}
+            {currentStep === 0 && (
+              <ClientRequestReview currentDescription={currentDescription} />
+            )}
             {currentStep === 1 && (
               <ReferenceProductSelection
                 oils={oils}

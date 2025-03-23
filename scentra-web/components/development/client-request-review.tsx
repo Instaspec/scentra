@@ -23,7 +23,13 @@ type Message = {
   content: string;
 };
 
-export function ClientRequestReview() {
+type ClientRequestReviewProps = {
+  currentDescription: string;
+};
+
+export function ClientRequestReview({
+  currentDescription,
+}: ClientRequestReviewProps) {
   const [notes, setNotes] = useState("");
   const [isOpen, setIsOpen] = useState(false); // Default to collapsed
   const [messages] = useState<Message[]>([
@@ -80,9 +86,8 @@ export function ClientRequestReview() {
         <CardContent>
           <div className="rounded-md bg-muted p-4">
             <p className="text-sm">
-              Fresh citrus-based fragrance with medium intensity, long-lasting
-              profile. Primary notes: bergamot, lemon, light floral undertones.
-              Avoid: heavy musk, overly sweet components.
+              {currentDescription ||
+                "Fresh citrus-based fragrance with medium intensity, long-lasting profile. Primary notes: bergamot, lemon, light floral undertones. Avoid: heavy musk, overly sweet components."}
             </p>
           </div>
         </CardContent>
