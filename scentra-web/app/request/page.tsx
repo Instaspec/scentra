@@ -17,6 +17,7 @@ import {
   SidebarMenuButton,
   SidebarProvider,
 } from "@/components/ui/sidebar"
+import { set } from 'date-fns'
 
 type Message = {
   role: "user" | "assistant"
@@ -41,7 +42,6 @@ export default function RequestPage() {
     },
   ])
   const [standardizedRequest, setStandardizedRequest] = useState<string | null>(null)
-  const [currentObjectDescription, setCurrentObjectDescription] = useState<string | null>(null)
   const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null)
   const [requests, setRequests] = useState<Request[]>([])
 
@@ -134,14 +134,22 @@ export default function RequestPage() {
     const response = await fetch("/api/openai", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: updatedChat.messages }),
+      body: JSON.stringify({
+        messages: updatedChat.messages,
+        description: updatedChat.description, // Include the description
+      }),
     })
 
     if (response.ok) {
-      const { content } = await response.json()
+      const { description, instruction } = await response.json()
+
+      setStandardizedRequest(description)
+
+      console.log("DESCRIPTION", description)
+      console.log("INSTRUCTION", instruction)
 
       // Finalize the assistant's response
-      const updatedMessages = [...updatedChat.messages, { role: "assistant", content }]
+      const updatedMessages = [...updatedChat.messages, { role: "assistant", content: instruction }]
       const finalUpdatedChat = { ...updatedChat, messages: updatedMessages }
 
       // Update the chat with the assistant's response in the state
@@ -189,11 +197,9 @@ export default function RequestPage() {
     if (selectedRequest) {
       setMessages(selectedRequest.messages)
       setStandardizedRequest(selectedRequest.description || null)
-      setCurrentObjectDescription(selectedRequest.description || null)
     } else {
       setMessages([])
       setStandardizedRequest(null)
-      setCurrentObjectDescription(null)
     }
   }
 
@@ -265,24 +271,6 @@ export default function RequestPage() {
             <div className="border-b bg-muted/50 p-4">
               <h3 className="mb-2 font-medium">Standardized Fragrance Request:</h3>
               <p className="text-sm">{standardizedRequest}</p>
-            </div>
-          )}
-
-          {/* Current Object Description */}
-          {selectedRequestId && currentObjectDescription && !standardizedRequest && (
-            <div className="border-b p-4">
-              <h3 className="mb-2 font-medium">Current Description:</h3>
-              <Card>
-                <CardContent className="p-3">
-                  <div className="flex flex-wrap gap-2">
-                    {currentObjectDescription.split(". ").map((segment, index) => (
-                      <Badge key={index} variant="outline" className="bg-background">
-                        {segment}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           )}
 

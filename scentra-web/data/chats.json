@@ -9,6 +9,14 @@
       {
         "role": "assistant",
         "content": "Hello, I need a custom fragrance."
+      },
+      {
+        "role": "user",
+        "content": "hi"
+      },
+      {
+        "role": "assistant",
+        "content": "Hello! How can I assist you today? If you’re looking for help with creating a custom fragrance, I’d love to help with that!"
       }
     ]
   },
@@ -16,7 +24,7 @@
     "id": "2",
     "name": "New Fragrance 2",
     "status": "editing",
-    "date": "2025-03-22T23:51:53.745Z",
+    "date": "2025-03-23T01:26:39.782Z",
     "description": "",
     "messages": [
       {
@@ -25,23 +33,15 @@
       },
       {
         "role": "user",
-        "content": "i want something new"
-      },
-      {
-        "role": "assistant",
-        "content": "Thank you for clarification! Could you provide more details?"
+        "content": "I want something a something refreshing"
       },
       {
         "role": "user",
-        "content": "hello"
+        "content": "I want something a something refreshing"
       },
       {
         "role": "assistant",
-        "content": "Thank you for clarification! Could you provide more details?"
-      },
-      {
-        "role": "user",
-        "content": "hello who are you?"
+        "content": "Great! To create a refreshing fragrance, we should start by identifying the product type. Are you looking to create a perfume, shampoo, candle, or something else?\n\nOnce we have that, we can explore the olfactive families that can give you that refreshing quality. Common choices for refreshing scents include:\n\n- **Citrus:** Bright and zesty (think lemon, lime, orange).\n- **Floral:** Light and uplifting (consider clean florals like lily or jasmine).\n- **Woody:** Earthy and grounding (think cedarwood or sandalwood).\n- **Herbal:** Invigorating and aromatic (like mint or basil).\n\nWhich product type are you interested in, and which olfactive family do you think aligns best with your idea of refreshing?"
       }
     ]
   },
@@ -49,7 +49,7 @@
     "id": "3",
     "name": "New Fragrance 3",
     "status": "editing",
-    "date": "2025-03-22T23:59:09.351Z",
+    "date": "2025-03-23T01:36:27.656Z",
     "description": "",
     "messages": [
       {
@@ -58,35 +58,7 @@
       },
       {
         "role": "user",
-        "content": "hi who are you?"
-      },
-      {
-        "role": "user",
-        "content": "hello"
-      },
-      {
-        "role": "user",
-        "content": "hi"
-      },
-      {
-        "role": "user",
-        "content": "hi"
-      },
-      {
-        "role": "user",
-        "content": "hi"
-      },
-      {
-        "role": "user",
-        "content": "hi"
-      },
-      {
-        "role": "user",
-        "content": "dl"
-      },
-      {
-        "role": "user",
-        "content": "hi"
+        "content": "I want a shampoo that is refreshing"
       }
     ]
   },
@@ -94,7 +66,7 @@
     "id": "4",
     "name": "New Fragrance 4",
     "status": "editing",
-    "date": "2025-03-23T00:13:02.897Z",
+    "date": "2025-03-23T01:38:48.923Z",
     "description": "",
     "messages": [
       {
@@ -103,36 +75,11 @@
       },
       {
         "role": "user",
-        "content": "hi who are u"
-      },
-      {
-        "role": "user",
-        "content": "who are you"
-      }
-    ]
-  },
-  {
-    "id": "5",
-    "name": "New Fragrance 5",
-    "status": "editing",
-    "date": "2025-03-23T00:19:04.360Z",
-    "description": "",
-    "messages": [
-      {
-        "role": "assistant",
-        "content": "What kind of fragrance would you like to create?"
-      },
-      {
-        "role": "user",
-        "content": "hi who are you?"
-      },
-      {
-        "role": "user",
-        "content": "hi who are you?"
+        "content": "I was refreshing shampoo"
       },
       {
         "role": "assistant",
-        "content": "Hello! I am a language model AI assistant here to help you. How can I assist you today?"
+        "content": "To refine your aroma description, think about the specific scents you associate with being refreshing. Consider familiar scents like lemon, mint, or apple that evoke freshness. Additionally, think about whether you prefer the fragrance to emphasize lighter top notes, a central heart, or if you want it grounded with base notes for longevity."
       }
     ]
   }
