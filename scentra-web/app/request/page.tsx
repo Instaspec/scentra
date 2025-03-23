@@ -83,6 +83,18 @@ export default function RequestPage() {
       setRequests([...requests, updatedChat])
       setSelectedRequestId(updatedChat.id)
       setMessages(updatedChat.messages)
+
+      // Save the new chat to the backend
+      const response = await fetch("/api/chats", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedChat),
+      })
+
+      if (response.ok) {
+        const updatedRequests = await response.json()
+        setRequests(updatedRequests)
+      }
     } else {
       // Update an existing chat
       const existingChat = requests.find((req) => req.id === selectedRequestId)
@@ -102,44 +114,49 @@ export default function RequestPage() {
       // Update the chat in the state
       setRequests(requests.map((req) => (req.id === selectedRequestId ? updatedChat : req)))
       setMessages(updatedMessages)
+
+      // Save the updated chat to the backend
+      const response = await fetch("/api/chats", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedChat),
+      })
+
+      if (response.ok) {
+        const updatedRequests = await response.json()
+        setRequests(updatedRequests)
+      }
     }
 
     setInput("") // Clear input after sending the message
 
-    // Save the updated chat to the backend and refresh the requests state
-    const response = await fetch("/api/chats", {
+    // Fetch OpenAI response
+    const response = await fetch("/api/openai", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedChat),
+      body: JSON.stringify({ messages: updatedChat.messages }),
     })
 
     if (response.ok) {
-      const updatedRequests = await response.json()
-      setRequests(updatedRequests) // Update the requests state with the latest data
-    }
+      const { content } = await response.json()
 
-    // Simulate chatbot response
-    setTimeout(async () => {
-      const botResponse = "Thank you for clarification! Could you provide more details?"
-      const updatedMessages = [...updatedChat.messages, { role: "assistant", content: botResponse }]
+      // Finalize the assistant's response
+      const updatedMessages = [...updatedChat.messages, { role: "assistant", content }]
       const finalUpdatedChat = { ...updatedChat, messages: updatedMessages }
 
       // Update the chat with the assistant's response in the state
       setMessages(updatedMessages)
       setRequests(requests.map((req) => (req.id === updatedChat.id ? finalUpdatedChat : req)))
 
-      // Save the updated chat with the assistant's response to the backend and refresh the requests state
-      const response = await fetch("/api/chats", {
+      // Save the updated chat with the assistant's response to the backend
+      await fetch("/api/chats", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(finalUpdatedChat),
       })
-
-      if (response.ok) {
-        const updatedRequests = await response.json()
-        setRequests(updatedRequests) // Update the requests state with the latest data
-      }
-    }, 1000)
+    } else {
+      console.error("Failed to fetch OpenAI response")
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -218,7 +235,7 @@ export default function RequestPage() {
 
             <div className="p-4">
               <Button className="w-full" onClick={sendToFragranceHouse} disabled={!standardizedRequest}>
-                Send to Fragrance House
+                Send Request
               </Button>
             </div>
           </SidebarContent>
