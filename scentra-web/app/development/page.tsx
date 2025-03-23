@@ -71,6 +71,32 @@ export default function DevelopmentPage() {
   };
 
   useEffect(() => {
+    const fetchChats = async () => {
+      try {
+        const response = await fetch("/api/chats");
+        if (!response.ok) {
+          throw new Error(`Failed to fetch chats: ${response.status}`);
+        }
+        const chatsData = await response.json();
+
+        // Map the chats data to the Request format
+        const formattedRequests = chatsData.map((chat: any) => ({
+          id: chat.id,
+          name: chat.name,
+          status: chat.status === "requested" ? "pending" : chat.status,
+          date: chat.date,
+        }));
+
+        setRequests(formattedRequests);
+      } catch (error) {
+        console.error("Error fetching chats:", error);
+      }
+    };
+
+    fetchChats();
+  }, []);
+
+  useEffect(() => {
     const _loadOils = async () => {
       try {
         const response = await fetch("/api/oils");

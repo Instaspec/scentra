@@ -1,25 +1,36 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { MessageSquare, User, Bot, ChevronDown, ChevronUp } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { useEffect, useState } from "react";
+import { MessageSquare, User, Bot, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 type Message = {
-  role: "user" | "assistant"
-  content: string
-}
+  role: "user" | "assistant";
+  content: string;
+};
 
 export function ClientRequestReview() {
-  const [notes, setNotes] = useState("")
-  const [isOpen, setIsOpen] = useState(false) // Default to collapsed
+  const [notes, setNotes] = useState("");
+  const [isOpen, setIsOpen] = useState(false); // Default to collapsed
   const [messages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hello! Please describe the fragrance you're looking for in as much detail as possible.",
+      content:
+        "Hello! Please describe the fragrance you're looking for in as much detail as possible.",
     },
     {
       role: "user",
@@ -28,7 +39,8 @@ export function ClientRequestReview() {
     },
     {
       role: "assistant",
-      content: "Could you tell me more about the intensity and longevity you're looking for?",
+      content:
+        "Could you tell me more about the intensity and longevity you're looking for?",
     },
     {
       role: "user",
@@ -37,7 +49,8 @@ export function ClientRequestReview() {
     },
     {
       role: "assistant",
-      content: "What specific notes or ingredients would you like to include or avoid?",
+      content:
+        "What specific notes or ingredients would you like to include or avoid?",
     },
     {
       role: "user",
@@ -48,7 +61,7 @@ export function ClientRequestReview() {
       role: "assistant",
       content: "Thank you for the details. I've standardized your request.",
     },
-  ])
+  ]);
 
   return (
     <div className="space-y-6 w-full">
@@ -60,14 +73,16 @@ export function ClientRequestReview() {
             Standardized Client Request
           </CardTitle>
           <CardDescription>
-            The system has standardized the client's natural language description into technical specifications.
+            The system has standardized the client's natural language
+            description into technical specifications.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="rounded-md bg-muted p-4">
             <p className="text-sm">
-              Fresh citrus-based fragrance with medium intensity, long-lasting profile. Primary notes: bergamot, lemon,
-              light floral undertones. Avoid: heavy musk, overly sweet components.
+              Fresh citrus-based fragrance with medium intensity, long-lasting
+              profile. Primary notes: bergamot, lemon, light floral undertones.
+              Avoid: heavy musk, overly sweet components.
             </p>
           </div>
         </CardContent>
@@ -81,12 +96,19 @@ export function ClientRequestReview() {
               <CardTitle>Chat History</CardTitle>
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" size="sm" className="w-9 p-0">
-                  {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  {isOpen ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
                   <span className="sr-only">Toggle</span>
                 </Button>
               </CollapsibleTrigger>
             </div>
-            <CardDescription>Complete conversation with the client to understand their requirements.</CardDescription>
+            <CardDescription>
+              Complete conversation with the client to understand their
+              requirements.
+            </CardDescription>
           </CardHeader>
 
           <CollapsibleContent>
@@ -94,10 +116,19 @@ export function ClientRequestReview() {
               <ScrollArea className="h-[300px] rounded-md border p-4">
                 <div className="space-y-4">
                   {messages.map((message, index) => (
-                    <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                    <div
+                      key={index}
+                      className={`flex ${
+                        message.role === "user"
+                          ? "justify-end"
+                          : "justify-start"
+                      }`}
+                    >
                       <div
                         className={`flex max-w-[80%] items-start gap-2 rounded-lg p-3 ${
-                          message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
+                          message.role === "user"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted"
                         }`}
                       >
                         {message.role === "user" ? (
@@ -120,7 +151,9 @@ export function ClientRequestReview() {
       <Card className="w-full">
         <CardHeader>
           <CardTitle>Development Notes</CardTitle>
-          <CardDescription>Add your notes about this client request for the development team.</CardDescription>
+          <CardDescription>
+            Add your notes about this client request for the development team.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Textarea
@@ -133,6 +166,5 @@ export function ClientRequestReview() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
-
